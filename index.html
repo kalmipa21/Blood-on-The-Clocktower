@@ -1,0 +1,3041 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>Clocktower Storyteller - Blood on the Clocktower</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+        min-height: 100vh;
+        color: #eee;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .header h1 {
+        font-size: 1.8rem;
+        background: linear-gradient(135deg, #e94560, #ff6b6b);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 5px;
+      }
+
+      .phase-indicator {
+        display: inline-block;
+        background: #e94560;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-top: 8px;
+      }
+
+      .tab-nav {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 20px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        padding: 5px;
+      }
+
+      .tab-btn {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        color: #aaa;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1rem;
+      }
+
+      .tab-btn:hover {
+        background: rgba(233, 69, 96, 0.2);
+        color: #fff;
+      }
+
+      .tab-btn.active {
+        background: #e94560;
+        color: white;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .panel {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 16px;
+        padding: 18px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .panel h3 {
+        color: #e94560;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        border-bottom: 2px solid #e94560;
+        padding-bottom: 8px;
+      }
+
+      .panel h4 {
+        color: #ffaa00;
+        margin: 15px 0 10px 0;
+        font-size: 0.9rem;
+      }
+
+      button {
+        background: #e94560;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s;
+        margin: 4px;
+      }
+
+      button:hover {
+        background: #ff6b6b;
+        transform: translateY(-1px);
+      }
+
+      button.secondary {
+        background: #2c3e66;
+      }
+
+      button.danger {
+        background: #6b2e3a;
+      }
+
+      button.success {
+        background: #2c6e2c;
+      }
+
+      button.warning {
+        background: #e67e22;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .player-input-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+      }
+
+      .player-input-row input {
+        flex: 1;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: white;
+      }
+
+      .player-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .player-card {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+      }
+
+      .player-card.poisoned {
+        border-left: 3px solid #9b59b6;
+      }
+
+      .player-card.drunk {
+        border-left: 3px solid #f39c12;
+      }
+
+      .badge {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.65rem;
+        font-weight: bold;
+      }
+
+      .badge-townsfolk {
+        background: #2c6e2c;
+      }
+      .badge-outsider {
+        background: #5dade2;
+      }
+      .badge-minion {
+        background: #c0392b;
+      }
+      .badge-demon {
+        background: #6b0000;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border-radius: 24px;
+        padding: 30px;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+        border: 2px solid #e94560;
+      }
+
+      .winner-modal {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border-radius: 24px;
+        padding: 30px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        border: 3px solid #ffaa00;
+      }
+
+      .roulette-name {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 20px 0;
+        color: #ffaa00;
+      }
+
+      .roulette-role {
+        font-size: 3rem;
+        font-weight: bold;
+        margin: 20px 0;
+        padding: 30px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 16px;
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 4px;
+        background: #333;
+        border-radius: 2px;
+        margin: 20px 0;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: #e94560;
+        width: 0%;
+        transition: width 0.3s;
+      }
+
+      .step-container {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+
+      .step-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .step-desc {
+        color: #aaa;
+        margin-bottom: 15px;
+        font-size: 0.85rem;
+      }
+
+      .step-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .log-area {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 0.75rem;
+        font-family: monospace;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .nominasi-table {
+        width: 100%;
+        font-size: 0.8rem;
+        border-collapse: collapse;
+      }
+
+      .nominasi-table th,
+      .nominasi-table td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .live-info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      select,
+      input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid #333;
+        border-radius: 6px;
+        padding: 8px 12px;
+        color: white;
+      }
+
+      select option {
+        background: #1a1a2e;
+      }
+
+      .phase-toggle {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .phase-toggle-btn {
+        flex: 1;
+        background: #2c3e66;
+      }
+
+      .phase-toggle-btn.active {
+        background: #e94560;
+      }
+
+      .dead-player-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 8px;
+        margin-bottom: 5px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        opacity: 0.7;
+      }
+
+      .night-controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .info-box {
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 8px;
+        padding: 10px;
+        margin: 10px 0;
+        border-left: 4px solid #e94560;
+      }
+
+      .info-text {
+        color: #ffaa00;
+        font-size: 0.9rem;
+      }
+
+      .dead-list {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🦇 CLOCKTOWER STORYTELLER</h1>
+        <p>
+          Blood on the Clocktower - Sistem Otomatis Penuh | Support 22 Pemain
+        </p>
+        <div class="phase-indicator" id="phaseIndicator">⚙️ SETUP GAME</div>
+      </div>
+
+      <!-- SETUP SCREEN -->
+      <div id="setupScreen">
+        <div class="panel">
+          <h3>👥 Setup Pemain</h3>
+          <div id="playerNameInputs"></div>
+          <div style="margin-top: 15px">
+            <button id="startRouletteBtn" class="success">
+              🎰 MULAI ROULETTE ROLE
+            </button>
+            <button id="resetNamesBtn" class="secondary">🔄 Reset</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>📚 Daftar Role</h3>
+          <div style="font-size: 0.8rem; color: #aaa">
+            <p>
+              <span class="badge badge-demon">Demon</span> (2): Imp, Po
+              <strong style="color: #f39c12"
+                >(untuk 18+ pemain, Imp dan Po HADIR BERSAMA!)</strong
+              >
+            </p>
+            <p>
+              <span class="badge badge-minion">Minion</span> (4): Poisoner, Spy,
+              Scarlet Woman, Necromancer
+            </p>
+            <p>
+              <span class="badge badge-outsider">Outsider</span> (3): Recluse,
+              Saint, Drunk
+            </p>
+            <p>
+              <span class="badge badge-townsfolk">Townsfolk</span> (13):
+              Washerwoman, Librarian, Investigator, Chef, Empath, Fortune
+              Teller, Undertaker, Monk, Ravenkeeper, Virgin, Slayer, Soldier,
+              Mayor
+            </p>
+            <p style="margin-top: 10px"><strong>Max pemain: 22</strong></p>
+            <p style="color: #f39c12">
+              <strong>⚡ Aturan Saint:</strong> Jika dibunuh Demon → 1 Minion
+              mati. Jika dieksekusi → Tim Baik kalah!
+            </p>
+            <p style="color: #f39c12">
+              <strong>⚡ Po:</strong> Jika tidak bunuh di malam sebelumnya, bisa
+              bunuh 3 orang di malam ini!
+            </p>
+            <p style="color: #e94560">
+              <strong>💀 Necromancer:</strong> Jika Demon mati, bisa
+              mengorbankan 1 Minion untuk mengubah pemain lain menjadi Demon
+              baru!
+            </p>
+            <p style="color: #e94560">
+              <strong>🏹 Slayer:</strong> Sekali sehari, bisa menembak Demon.
+              Jika kena Recluse, tidak mati.
+            </p>
+            <p style="color: #e94560">
+              <strong>👁️ Ravenkeeper:</strong> Jika mati di malam hari, bisa
+              melihat role 1 pemain.
+            </p>
+            <p style="color: #e94560">
+              <strong>🩸 Scarlet Woman:</strong> Jika Imp mati, dia menjadi Imp
+              baru.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAME DASHBOARD -->
+      <div id="gameDashboard" class="hidden">
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="grimoire">
+            📖 Grimoire
+          </button>
+          <button class="tab-btn" data-tab="activity">🎮 Activity</button>
+          <button class="tab-btn" data-tab="status">📊 Status</button>
+          <button class="tab-btn" data-tab="logs">📜 Logs</button>
+        </div>
+
+        <!-- TAB 1: GRIMOIRE -->
+        <div id="tab-grimoire" class="tab-content active">
+          <div class="panel">
+            <h3>📖 Grimoire (Role Asli Pemain - Hidup)</h3>
+            <p style="color: #aaa; margin-bottom: 15px">
+              ⚠️ Hanya untuk mata Storyteller!
+            </p>
+            <div class="player-list" id="grimoireList"></div>
+
+            <h3 style="margin-top: 20px">💀 Pemain Mati</h3>
+            <div id="deadPlayersList" class="player-list"></div>
+
+            <div style="margin-top: 15px">
+              <button id="resetGameFromGameBtn" class="secondary">
+                🔄 Reset ke Setup
+              </button>
+              <button id="saveGameBtn" class="secondary">💾 Save Game</button>
+              <button id="loadGameBtn" class="secondary">📂 Load Game</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: ACTIVITY -->
+        <div id="tab-activity" class="tab-content">
+          <div class="panel">
+            <div class="phase-toggle">
+              <button id="nightPhaseToggleBtn" class="phase-toggle-btn active">
+                🌙 Night Phase
+              </button>
+              <button id="dayPhaseToggleBtn" class="phase-toggle-btn">
+                ☀️ Day Phase
+              </button>
+            </div>
+
+            <!-- Night Phase Content -->
+            <div id="nightPhaseContent">
+              <div class="night-controls">
+                <button id="startNightBtn" class="success">
+                  🌙 START NIGHT <span id="nightNumberDisplay">1</span>
+                </button>
+                <button id="nightEndBtn" class="warning" disabled>
+                  🏁 NIGHT END
+                </button>
+              </div>
+              <div id="nightStepsContainer" class="hidden">
+                <div id="nightStepsList"></div>
+                <button id="nextStepBtn" class="secondary">▶ Next Step</button>
+              </div>
+              <div id="deadByDemonList" class="dead-list">
+                <h4>💀 Korban Malam Ini:</h4>
+                <div id="deadByDemonContainer">Belum ada yang mati</div>
+              </div>
+            </div>
+
+            <!-- Day Phase Content -->
+            <div id="dayPhaseContent" class="hidden">
+              <div class="night-controls">
+                <button id="endDayBtn" class="warning">🏁 END THE DAY</button>
+              </div>
+              <div id="dayStepsContainer">
+                <!-- Slayer Section -->
+                <div class="step-container" id="slayerSection">
+                  <h4>🏹 Slayer Ability</h4>
+                  <div id="slayerContent"></div>
+                </div>
+
+                <div class="step-container">
+                  <h4>🗳️ Nominasi</h4>
+                  <div style="display: flex; gap: 10px; flex-wrap: wrap">
+                    <select id="nominatorSelect" style="flex: 1"></select>
+                    <select id="targetSelect" style="flex: 1"></select>
+                    <button id="addNominasiBtn">📝 Tambah</button>
+                  </div>
+                  <h4>📜 Daftar Nominasi</h4>
+                  <table class="nominasi-table">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>Nominator</th>
+                        <th>Tertuduh</th>
+                        <th>Suara</th>
+                        <th>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody id="nominasiBody"></tbody>
+                  </table>
+                  <h4>📝 Input Suara</h4>
+                  <select
+                    id="voteNominasiSelect"
+                    style="width: 100%; margin-bottom: 10px"
+                  ></select>
+                  <input
+                    type="number"
+                    id="voteCountInput"
+                    placeholder="Jumlah suara SETUJU"
+                    style="width: 100%; margin-bottom: 10px"
+                  />
+                  <div
+                    id="thresholdInfo"
+                    style="font-size: 0.8rem; margin-bottom: 10px"
+                  ></div>
+                  <div style="display: flex; gap: 10px">
+                    <button id="saveVoteBtn" class="secondary">
+                      💾 Simpan
+                    </button>
+                    <button id="executeBtn" class="danger">💀 EKSEKUSI</button>
+                  </div>
+                </div>
+              </div>
+              <div id="dayDeadList" class="dead-list" style="margin-top: 15px">
+                <h4>💀 Pemain Mati (Siang Ini):</h4>
+                <div id="dayDeadContainer">Belum ada yang mati</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: STATUS -->
+        <div id="tab-status" class="tab-content">
+          <div class="panel">
+            <h3>📊 Live Status</h3>
+            <div id="liveStatus"></div>
+          </div>
+          <div class="panel">
+            <h3>⭐ Virgin Status</h3>
+            <div id="virginStatus" class="log-area"></div>
+            <h3>☠️ Pemain Mati & Hak Suara</h3>
+            <div id="deadPlayersInfo" class="log-area"></div>
+            <h3>⚡ Po Charge Status</h3>
+            <div id="poChargeStatus" class="log-area"></div>
+            <h3>🛡️ Monk Protection</h3>
+            <div id="monkStatus" class="log-area"></div>
+            <h3>💀 Necromancer Status</h3>
+            <div id="necromancerStatus" class="log-area"></div>
+          </div>
+        </div>
+
+        <!-- TAB 4: LOGS -->
+        <div id="tab-logs" class="tab-content">
+          <div class="panel">
+            <h3>📜 Night Logs</h3>
+            <div class="log-area" id="nightLogPanel"></div>
+            <h3>📜 Execution Logs</h3>
+            <div class="log-area" id="executionLogPanel"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ==================== DATA ====================
+      let players = [];
+      let currentNight = 1;
+      let currentDay = 0;
+      let isDayPhase = false;
+      let isNightStarted = false;
+      let virginActive = true;
+      let virginPlayerId = null;
+      let currentStepIndex = 0;
+      let nominations = [];
+      let nightLogs = [];
+      let executionLogs = [];
+      let dayDeadNames = [];
+
+      // Night step results
+      let currentNightSteps = [];
+      let protectedPlayerId = null;
+      let killedByDemon = [];
+      let poisonedTargetId = null;
+      let slayerUsed = false;
+      let necromancerUsed = false;
+      let ravenkeeperUsed = false;
+      let scarletWomanUsed = false;
+      let necromancerPending = false;
+      let necromancerTargetDemonType = null;
+
+      // Demon data
+      let demonsInGame = [];
+      let hasTwoDemons = false;
+      let gameWinner = null;
+
+      // Roulette data
+      let roulettePlayerNames = [];
+      let rouletteAssignedRoles = [];
+      let rouletteCurrentIndex = 0;
+      let rouletteModal = null;
+      let rouletteSpinInterval = null;
+
+      // Role lists
+      const TOWNSFOLK = [
+        "Washerwoman",
+        "Librarian",
+        "Investigator",
+        "Chef",
+        "Empath",
+        "Fortune Teller",
+        "Undertaker",
+        "Monk",
+        "Ravenkeeper",
+        "Virgin",
+        "Slayer",
+        "Soldier",
+        "Mayor",
+      ];
+      const OUTSIDERS_BASE = ["Recluse", "Saint"];
+      const MINIONS = ["Poisoner", "Spy", "Scarlet Woman", "Necromancer"];
+      const DEMONS = ["Imp", "Po"];
+
+      // ==================== HELPER FUNCTIONS ====================
+      function getRoleCategory(role) {
+        if (TOWNSFOLK.includes(role)) return "townsfolk";
+        if (OUTSIDERS_BASE.includes(role) || role === "Drunk")
+          return "outsider";
+        if (MINIONS.includes(role)) return "minion";
+        return "demon";
+      }
+
+      function getAliveCount() {
+        return players.filter((p) => p.isAlive).length;
+      }
+
+      function isPlayerPoisonedOrDrunk(playerId) {
+        const player = players.find((p) => p.id === playerId);
+        if (!player) return false;
+        return player.isPoisoned || player.isDrunk;
+      }
+
+      function getTrueNeighbors(playerId) {
+        const alivePlayers = players.filter((p) => p.isAlive);
+        const aliveIds = alivePlayers.map((p) => p.id);
+        const currentIndex = aliveIds.indexOf(playerId);
+        let leftNeighbor = null;
+        let rightNeighbor = null;
+        if (currentIndex > 0) leftNeighbor = alivePlayers[currentIndex - 1];
+        if (currentIndex < alivePlayers.length - 1)
+          rightNeighbor = alivePlayers[currentIndex + 1];
+        return { left: leftNeighbor, right: rightNeighbor };
+      }
+
+      function getAdjacentEvilCount(playerId) {
+        const { left, right } = getTrueNeighbors(playerId);
+        let count = 0;
+        const isEvil = (p) =>
+          (MINIONS.includes(p.actualRole) || DEMONS.includes(p.actualRole)) &&
+          p.isAlive;
+        if (left && isEvil(left)) count++;
+        if (right && isEvil(right)) count++;
+        return count;
+      }
+
+      function getAdjacentEvilPairs() {
+        const alivePlayers = players.filter((p) => p.isAlive);
+        let pairCount = 0;
+        for (let i = 0; i < alivePlayers.length - 1; i++) {
+          const isEvil1 =
+            MINIONS.includes(alivePlayers[i].actualRole) ||
+            DEMONS.includes(alivePlayers[i].actualRole);
+          const isEvil2 =
+            MINIONS.includes(alivePlayers[i + 1].actualRole) ||
+            DEMONS.includes(alivePlayers[i + 1].actualRole);
+          if (isEvil1 && isEvil2) pairCount++;
+        }
+        return pairCount;
+      }
+
+      function getRandomAlivePlayers(count, excludeIds = []) {
+        const alive = players.filter(
+          (p) => p.isAlive && !excludeIds.includes(p.id)
+        );
+        const shuffled = [...alive];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled.slice(0, count);
+      }
+
+      function getRandomTownsfolk() {
+        const aliveTownsfolk = players.filter(
+          (p) => TOWNSFOLK.includes(p.actualRole) && p.isAlive
+        );
+        if (aliveTownsfolk.length === 0) return null;
+        return aliveTownsfolk[
+          Math.floor(Math.random() * aliveTownsfolk.length)
+        ];
+      }
+
+      function getRandomOutsider() {
+        const aliveOutsider = players.filter(
+          (p) => OUTSIDERS_BASE.includes(p.actualRole) && p.isAlive
+        );
+        if (aliveOutsider.length === 0) return null;
+        return aliveOutsider[Math.floor(Math.random() * aliveOutsider.length)];
+      }
+
+      function getRandomMinion() {
+        const aliveMinions = players.filter(
+          (p) => MINIONS.includes(p.actualRole) && p.isAlive
+        );
+        if (aliveMinions.length === 0) return null;
+        return aliveMinions[Math.floor(Math.random() * aliveMinions.length)];
+      }
+
+      function showWinnerModal(winner, message) {
+        if (gameWinner) return;
+        gameWinner = winner;
+        const modal = document.createElement("div");
+        modal.className = "modal";
+        modal.innerHTML = `
+            <div class="winner-modal">
+                <h1 style="font-size:2rem; margin-bottom:20px;">${
+                  winner === "good"
+                    ? "🎉 TIM BAIK MENANG! 🎉"
+                    : "🧛 TIM JAHAT MENANG! 🧛"
+                }</h1>
+                <p style="margin-bottom:20px;">${message}</p>
+                <button id="closeWinnerModal" class="success">OK</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById("closeWinnerModal").onclick = () =>
+          modal.remove();
+      }
+
+      function showPopup(message, title = "Informasi") {
+        const modal = document.createElement("div");
+        modal.className = "modal";
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2 style="color:#e94560; margin-bottom:15px;">${title}</h2>
+                <p style="margin-bottom:20px;">${message}</p>
+                <button id="closePopupBtn" class="success">OK</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById("closePopupBtn").onclick = () => modal.remove();
+        return modal;
+      }
+
+      function addNightLog(msg) {
+        nightLogs.unshift(`[Malam ${currentNight}] ${msg}`);
+        if (nightLogs.length > 30) nightLogs.pop();
+        const logPanel = document.getElementById("nightLogPanel");
+        if (logPanel)
+          logPanel.innerHTML = nightLogs.map((l) => `<div>${l}</div>`).join("");
+      }
+
+      function addExecutionLog(msg) {
+        executionLogs.unshift(msg);
+        if (executionLogs.length > 30) executionLogs.pop();
+        const logPanel = document.getElementById("executionLogPanel");
+        if (logPanel)
+          logPanel.innerHTML = executionLogs
+            .map((l) => `<div>${l}</div>`)
+            .join("");
+      }
+
+      // ==================== UPDATE DEAD PLAYERS LIST ====================
+      function updateGrimoireAndDayDeadList() {
+        const aliveContainer = document.getElementById("grimoireList");
+        const deadContainer = document.getElementById("deadPlayersList");
+        const alivePlayers = players.filter((p) => p.isAlive);
+        const deadPlayersList = players.filter((p) => !p.isAlive);
+
+        if (aliveContainer) {
+          aliveContainer.innerHTML = alivePlayers
+            .map(
+              (p) => `
+                <div class="player-card ${p.isPoisoned ? "poisoned" : ""} ${
+                p.isDrunk ? "drunk" : ""
+              }">
+                    <div>
+                        <div><strong>${p.name}</strong> 🟢</div>
+                        <div style="font-size:0.7rem;">Role asli: <strong style="color:#ffaa00;">${
+                          p.actualRole
+                        }</strong></div>
+                        <div style="font-size:0.7rem;">Diberi tahu: ${
+                          p.displayedRole
+                        }</div>
+                        ${
+                          p.isDrunk
+                            ? `<div style="color:#f39c12;">🍺 DRUNK (merasa ${p.drunkBelieves})</div>`
+                            : ""
+                        }
+                        ${
+                          p.isPoisoned
+                            ? `<div style="color:#9b59b6;">☠️ POISONED</div>`
+                            : ""
+                        }
+                        ${
+                          p.isSaint
+                            ? `<div style="color:#e67e22;">⚠️ SAINT</div>`
+                            : ""
+                        }
+                    </div>
+                    <div><span class="badge badge-${getRoleCategory(
+                      p.actualRole
+                    )}">${p.actualRole}</span></div>
+                </div>
+            `
+            )
+            .join("");
+        }
+
+        if (deadContainer) {
+          deadContainer.innerHTML = deadPlayersList
+            .map(
+              (p) => `
+                <div class="dead-player-card">
+                    <div><strong>${p.name}</strong> 💀</div>
+                    <div style="font-size:0.7rem;">Role: ${p.actualRole}</div>
+                    <div style="font-size:0.7rem;">Hak suara: ${
+                      p.usedGhostVote ? "Sudah dipakai" : "1 tersisa"
+                    }</div>
+                </div>
+            `
+            )
+            .join("");
+        }
+
+        const dayDeadContainer = document.getElementById("dayDeadContainer");
+        const allDead = deadPlayersList.map((p) => p.name);
+        if (dayDeadContainer) {
+          if (allDead.length === 0) {
+            dayDeadContainer.innerHTML = "Belum ada yang mati";
+          } else {
+            dayDeadContainer.innerHTML = allDead
+              .map((name) => `<div>💀 ${name}</div>`)
+              .join("");
+          }
+        }
+      }
+
+      function addToDeadList(playerName) {
+        if (!dayDeadNames.includes(playerName)) {
+          dayDeadNames.push(playerName);
+        }
+        updateGrimoireAndDayDeadList();
+      }
+
+      // ==================== SCARLET WOMAN FUNCTION ====================
+      function activateScarletWoman(deadImpName) {
+        const scarletWoman = players.find(
+          (p) => p.actualRole === "Scarlet Woman" && p.isAlive
+        );
+        if (scarletWoman && !scarletWomanUsed) {
+          scarletWomanUsed = true;
+          scarletWoman.actualRole = "Imp";
+          scarletWoman.displayedRole = "Imp";
+
+          const demonIndex = demonsInGame.findIndex(
+            (d) => d.demonType === "Imp"
+          );
+          if (demonIndex !== -1) {
+            demonsInGame.splice(demonIndex, 1);
+          }
+          demonsInGame.push({
+            playerId: scarletWoman.id,
+            demonType: "Imp",
+            poCharged: false,
+            poLastNightKilled: true,
+          });
+
+          addExecutionLog(
+            `🩸 SCARLET WOMAN berubah menjadi IMP (Demon baru) setelah ${deadImpName} mati!`
+          );
+          showPopup(
+            `Scarlet Woman berubah menjadi IMP! Game berlanjut.`,
+            "🩸 SCARLET WOMAN AKTIF"
+          );
+          updateGrimoireAndDayDeadList();
+          updateLiveStatus();
+          return true;
+        }
+        return false;
+      }
+
+      // ==================== NECROMANCER FUNCTION ====================
+      function queueNecromancer(demonType) {
+        const necromancer = players.find(
+          (p) => p.actualRole === "Necromancer" && p.isAlive
+        );
+        if (necromancer && !necromancerUsed) {
+          necromancerPending = true;
+          necromancerTargetDemonType = demonType;
+          addExecutionLog(
+            `💀 NECROMANCER akan aktif di malam berikutnya karena Demon (${demonType}) mati!`
+          );
+          addNightLog(
+            `💀 NECROMANCER terpicu! Akan muncul di malam berikutnya.`
+          );
+          return true;
+        }
+        return false;
+      }
+
+      function executeNecromancer() {
+        if (!necromancerPending) return false;
+
+        const necromancer = players.find(
+          (p) => p.actualRole === "Necromancer" && p.isAlive
+        );
+        if (!necromancer || necromancerUsed) {
+          necromancerPending = false;
+          return false;
+        }
+
+        const aliveMinions = players.filter(
+          (p) =>
+            MINIONS.includes(p.actualRole) &&
+            p.isAlive &&
+            p.id !== necromancer.id
+        );
+        const aliveTownsfolk = players.filter(
+          (p) => TOWNSFOLK.includes(p.actualRole) && p.isAlive
+        );
+
+        if (aliveMinions.length === 0 || aliveTownsfolk.length === 0) {
+          addNightLog(
+            `💀 Necromancer tidak bisa aktif karena tidak ada Minion atau Townsfolk yang tersedia!`
+          );
+          necromancerPending = false;
+          return false;
+        }
+
+        necromancerUsed = true;
+        necromancerPending = false;
+
+        const modal = document.createElement("div");
+        modal.className = "modal";
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2 style="color:#e94560;">💀 NECROMANCER AKTIF!</h2>
+                <p>Necromancer mengorbankan dirinya untuk menciptakan Demon baru.</p>
+                <p>Pilih Minion yang akan dikorbankan:</p>
+                <select id="necromancerMinionTarget" style="width:100%; margin:10px 0;">
+                    <option value="">-- Pilih Minion --</option>
+                    ${aliveMinions
+                      .map(
+                        (p) =>
+                          `<option value="${p.id}">${p.name} (${p.actualRole})</option>`
+                      )
+                      .join("")}
+                </select>
+                <p>Pilih pemain yang akan berubah menjadi ${
+                  necromancerTargetDemonType === "Imp" ? "IMP" : "PO"
+                }:</p>
+                <select id="necromancerTownTarget" style="width:100%; margin:10px 0;">
+                    <option value="">-- Pilih pemain --</option>
+                    ${aliveTownsfolk
+                      .map(
+                        (p) =>
+                          `<option value="${p.id}">${p.name} (${p.actualRole})</option>`
+                      )
+                      .join("")}
+                </select>
+                <button id="necromancerConfirmBtn" class="success">Ubah Menjadi Demon</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById("necromancerConfirmBtn").onclick = () => {
+          const minionId = parseInt(
+            document.getElementById("necromancerMinionTarget").value
+          );
+          const townId = parseInt(
+            document.getElementById("necromancerTownTarget").value
+          );
+          if (isNaN(minionId) || isNaN(townId)) {
+            alert("Pilih Minion dan target");
+            return;
+          }
+
+          const minion = players.find((p) => p.id === minionId);
+          const targetTown = players.find((p) => p.id === townId);
+
+          if (minion && targetTown) {
+            minion.isAlive = false;
+            addToDeadList(minion.name);
+            addNightLog(
+              `💀 Necromancer mengorbankan ${minion.name} (${minion.actualRole})!`
+            );
+
+            const oldRole = targetTown.actualRole;
+            targetTown.actualRole =
+              necromancerTargetDemonType === "Imp" ? "Imp" : "Po";
+            targetTown.displayedRole = targetTown.actualRole;
+            addNightLog(
+              `✨ ${targetTown.name} (${oldRole}) menjadi ${targetTown.actualRole}!`
+            );
+
+            if (targetTown.actualRole === "Imp") {
+              demonsInGame.push({
+                playerId: targetTown.id,
+                demonType: "Imp",
+                poCharged: false,
+                poLastNightKilled: true,
+              });
+            } else {
+              demonsInGame.push({
+                playerId: targetTown.id,
+                demonType: "Po",
+                poCharged: false,
+                poLastNightKilled: true,
+              });
+            }
+
+            necromancer.isAlive = false;
+            addToDeadList(necromancer.name);
+
+            showPopup(
+              `${minion.name} mati!\n${targetTown.name} menjadi ${targetTown.actualRole}!`,
+              "💀 NECROMANCER"
+            );
+            modal.remove();
+            updateGrimoireAndDayDeadList();
+            updateLiveStatus();
+            checkWinCondition();
+          }
+        };
+        return true;
+      }
+
+      // ==================== ROLE GENERATION ====================
+      function getSaintCountForPlayerCount(playerCount) {
+        if (playerCount >= 19) return 3;
+        if (playerCount >= 15) return 2;
+        return 1;
+      }
+
+      function getMinionCountForPlayerCount(playerCount) {
+        if (playerCount >= 18) return 5;
+        if (playerCount >= 12) return 4;
+        if (playerCount >= 9) return 3;
+        return 2;
+      }
+
+      function getDemonCountForPlayerCount(playerCount) {
+        return playerCount >= 18 ? 2 : 1;
+      }
+
+      function generateRolePool(playerCount) {
+        let rolePool = [];
+        let minionCount = getMinionCountForPlayerCount(playerCount);
+        let outsiderCount = Math.floor(playerCount / 4);
+        if (playerCount <= 6) outsiderCount = 1;
+        if (playerCount >= 19) outsiderCount = 3;
+        if (playerCount >= 15 && playerCount <= 18) outsiderCount = 2;
+        let demonCount = getDemonCountForPlayerCount(playerCount);
+
+        if (demonCount === 2) {
+          rolePool.push("Imp");
+          rolePool.push("Po");
+          hasTwoDemons = true;
+        } else {
+          let singleDemon = Math.random() < 0.5 ? "Imp" : "Po";
+          rolePool.push(singleDemon);
+          hasTwoDemons = false;
+        }
+
+        let minionsAdded = 0;
+        while (minionsAdded < minionCount) {
+          for (
+            let i = 0;
+            i < MINIONS.length && minionsAdded < minionCount;
+            i++
+          ) {
+            rolePool.push(MINIONS[i]);
+            minionsAdded++;
+          }
+        }
+
+        let saintCount = getSaintCountForPlayerCount(playerCount);
+        rolePool.push("Recluse");
+        for (let i = 0; i < saintCount; i++) rolePool.push("Saint");
+
+        let remaining = playerCount - rolePool.length;
+        for (let i = 0; i < remaining; i++) {
+          rolePool.push(TOWNSFOLK[i % TOWNSFOLK.length]);
+        }
+
+        for (let i = rolePool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [rolePool[i], rolePool[j]] = [rolePool[j], rolePool[i]];
+        }
+        return rolePool;
+      }
+
+      function assignRolesToPlayers(playerNames, rolePool) {
+        let newPlayers = [];
+        for (let i = 0; i < playerNames.length; i++) {
+          newPlayers.push({
+            id: i,
+            name: playerNames[i],
+            actualRole: rolePool[i],
+            displayedRole: rolePool[i],
+            isAlive: true,
+            isPoisoned: false,
+            isDrunk: false,
+            drunkBelieves: null,
+            usedGhostVote: false,
+            isVirgin: rolePool[i] === "Virgin",
+            hasUsedVirginAbility: false,
+            isSaint: rolePool[i] === "Saint",
+            isRecluse: rolePool[i] === "Recluse",
+          });
+        }
+
+        demonsInGame = [];
+        newPlayers.forEach((p) => {
+          if (p.actualRole === "Imp" || p.actualRole === "Po") {
+            demonsInGame.push({
+              playerId: p.id,
+              demonType: p.actualRole,
+              poCharged: false,
+              poLastNightKilled: true,
+            });
+          }
+        });
+
+        let townsfolkPlayers = newPlayers.filter(
+          (p) => TOWNSFOLK.includes(p.actualRole) && p.actualRole !== "Virgin"
+        );
+        if (townsfolkPlayers.length > 0) {
+          let randomIndex = Math.floor(Math.random() * townsfolkPlayers.length);
+          let drunkPlayer = townsfolkPlayers[randomIndex];
+          drunkPlayer.actualRole = "Drunk";
+          drunkPlayer.isDrunk = true;
+          let availableFakeRoles = TOWNSFOLK.filter(
+            (role) => role !== "Virgin"
+          );
+          let fakeRole =
+            availableFakeRoles[
+              Math.floor(Math.random() * availableFakeRoles.length)
+            ];
+          drunkPlayer.displayedRole = fakeRole;
+          drunkPlayer.drunkBelieves = fakeRole;
+        }
+        return newPlayers;
+      }
+
+      // ==================== ROULETTE ====================
+      function startRoulette() {
+        const nameInputs = document.querySelectorAll(".player-name-input");
+        roulettePlayerNames = [];
+        for (let input of nameInputs) {
+          let name = input.value.trim();
+          if (name === "") name = `Player ${roulettePlayerNames.length + 1}`;
+          roulettePlayerNames.push(name);
+        }
+        const playerCount = roulettePlayerNames.length;
+        if (playerCount < 5 || playerCount > 22) {
+          alert("Jumlah pemain harus antara 5-22 orang!");
+          return;
+        }
+        const rolePool = generateRolePool(playerCount);
+        rouletteAssignedRoles = [...rolePool];
+        rouletteCurrentIndex = 0;
+        createRouletteModal();
+      }
+
+      function createRouletteModal() {
+        if (rouletteModal) rouletteModal.remove();
+        rouletteModal = document.createElement("div");
+        rouletteModal.className = "modal";
+        const demonInfo = hasTwoDemons
+          ? "🔥 2 DEMON: Imp + Po hadir bersama!"
+          : `Demon: ${
+              rouletteAssignedRoles.find((r) => r === "Imp" || r === "Po") ||
+              "Imp/Po"
+            }`;
+        rouletteModal.innerHTML = `
+            <div class="modal-content">
+                <h2 style="color:#e94560;">🎰 ROULETTE ROLE 🎰</h2>
+                <p style="font-size:0.8rem; color:#f39c12;">${demonInfo}</p>
+                <div class="progress-bar"><div class="progress-fill" id="rouletteProgress"></div></div>
+                <div id="rouletteName" class="roulette-name">-</div>
+                <div id="rouletteRole" class="roulette-role">???</div>
+                <div id="rouletteCounter" style="font-size:0.9rem; margin-bottom:15px;"></div>
+                <div style="display:flex; gap:10px; justify-content:center;">
+                    <button id="rouletteStopBtn" class="danger">🛑 STOP</button>
+                    <button id="rouletteNextBtn" class="success" disabled>▶ Next Pemain</button>
+                </div>
+                <div style="margin-top:20px;"><button id="skipAllRouletteBtn" class="secondary" style="width:100%;">⏩ Skip Semua</button></div>
+            </div>
+        `;
+        document.body.appendChild(rouletteModal);
+        updateRouletteProgress();
+        showCurrentRoulettePlayerAndAutoSpin();
+        document.getElementById("rouletteStopBtn").onclick = () =>
+          stopRouletteSpin();
+        document.getElementById("rouletteNextBtn").onclick = () =>
+          nextRoulettePlayer();
+        document.getElementById("skipAllRouletteBtn").onclick = () =>
+          skipAllRoulette();
+      }
+
+      function updateRouletteProgress() {
+        const fill = document.getElementById("rouletteProgress");
+        if (fill)
+          fill.style.width = `${
+            (rouletteCurrentIndex / roulettePlayerNames.length) * 100
+          }%`;
+      }
+
+      function showCurrentRoulettePlayerAndAutoSpin() {
+        if (rouletteCurrentIndex >= roulettePlayerNames.length) {
+          finishRoulette();
+          return;
+        }
+        document.getElementById(
+          "rouletteName"
+        ).innerHTML = `🎭 ${roulettePlayerNames[rouletteCurrentIndex]}`;
+        document.getElementById("rouletteCounter").innerHTML = `Pemain ${
+          rouletteCurrentIndex + 1
+        } dari ${roulettePlayerNames.length}`;
+        document.getElementById("rouletteRole").innerHTML = "???";
+        document.getElementById("rouletteRole").style.background =
+          "rgba(0,0,0,0.5)";
+        document.getElementById("rouletteStopBtn").disabled = false;
+        document.getElementById("rouletteNextBtn").disabled = true;
+        startRouletteSpin();
+      }
+
+      function startRouletteSpin() {
+        if (rouletteSpinInterval) clearInterval(rouletteSpinInterval);
+        const allRoles = [
+          ...TOWNSFOLK,
+          ...OUTSIDERS_BASE,
+          ...MINIONS,
+          ...DEMONS,
+        ];
+        rouletteSpinInterval = setInterval(() => {
+          const randomRole =
+            allRoles[Math.floor(Math.random() * allRoles.length)];
+          document.getElementById("rouletteRole").innerHTML = randomRole;
+        }, 30);
+      }
+
+      function stopRouletteSpin() {
+        if (rouletteSpinInterval) clearInterval(rouletteSpinInterval);
+        const assignedRole = rouletteAssignedRoles[rouletteCurrentIndex];
+        const roleElem = document.getElementById("rouletteRole");
+        roleElem.innerHTML = assignedRole;
+        if (assignedRole === "Drunk") roleElem.style.background = "#f39c12";
+        else if (assignedRole === "Imp") roleElem.style.background = "#6b0000";
+        else if (assignedRole === "Po") roleElem.style.background = "#8e44ad";
+        else if (MINIONS.includes(assignedRole))
+          roleElem.style.background = "#c0392b";
+        else if (OUTSIDERS_BASE.includes(assignedRole))
+          roleElem.style.background = "#5dade2";
+        else roleElem.style.background = "#2c6e2c";
+        document.getElementById("rouletteStopBtn").disabled = true;
+        document.getElementById("rouletteNextBtn").disabled = false;
+      }
+
+      function nextRoulettePlayer() {
+        if (rouletteSpinInterval) clearInterval(rouletteSpinInterval);
+        rouletteCurrentIndex++;
+        updateRouletteProgress();
+        if (rouletteCurrentIndex < roulettePlayerNames.length)
+          showCurrentRoulettePlayerAndAutoSpin();
+        else finishRoulette();
+      }
+
+      function skipAllRoulette() {
+        if (rouletteSpinInterval) clearInterval(rouletteSpinInterval);
+        finishRoulette();
+      }
+
+      function finishRoulette() {
+        if (rouletteSpinInterval) clearInterval(rouletteSpinInterval);
+        if (rouletteModal) rouletteModal.remove();
+        players = assignRolesToPlayers(
+          roulettePlayerNames,
+          rouletteAssignedRoles
+        );
+        const virgin = players.find((p) => p.actualRole === "Virgin");
+        virginPlayerId = virgin ? virgin.id : null;
+        virginActive = virginPlayerId !== null;
+        currentNight = 1;
+        currentDay = 0;
+        isDayPhase = false;
+        isNightStarted = false;
+        nominations = [];
+        nightLogs = [];
+        executionLogs = [];
+        killedByDemon = [];
+        dayDeadNames = [];
+        protectedPlayerId = null;
+        slayerUsed = false;
+        necromancerUsed = false;
+        ravenkeeperUsed = false;
+        scarletWomanUsed = false;
+        necromancerPending = false;
+        gameWinner = null;
+
+        document.getElementById("setupScreen").classList.add("hidden");
+        document.getElementById("gameDashboard").classList.remove("hidden");
+        document.getElementById("phaseIndicator").innerHTML = "🌙 NIGHT PHASE";
+        updateGrimoireAndDayDeadList();
+        updateLiveStatus();
+        updateDropdowns();
+        updateNominasiTable();
+        updateVoteNominasiSelect();
+        updateThresholdInfo();
+        updateDeadPlayersInfo();
+        updateVirginStatus();
+        updatePoChargeStatus();
+        updateNecromancerStatus();
+        updateSlayerSection();
+
+        const drunkPlayer = players.find((p) => p.isDrunk);
+        if (drunkPlayer)
+          alert(
+            `🎲 DRUNK terpilih!\n\nPemain: ${drunkPlayer.name}\nRole asli: DRUNK\nDiberi tahu: ${drunkPlayer.displayedRole}`
+          );
+        if (hasTwoDemons)
+          alert(
+            `🔥 2 DEMON DALAM PERMAINAN!\n\nImp dan Po hadir bersama!\n\n⚡ Aturan:\n- Tim Baik harus membunuh KEDUA Demon\n- Setiap malam, Imp dan Po MASING-MASING bisa membunuh`
+          );
+      }
+
+      // ==================== NIGHT PHASE BUILD STEPS ====================
+      function buildNightSteps() {
+        const steps = [];
+        const isFirstNight = currentNight === 1;
+
+        if (
+          isFirstNight &&
+          players.some((p) => MINIONS.includes(p.actualRole) && p.isAlive)
+        ) {
+          steps.push({
+            type: "minion_info",
+            name: "Minion Info",
+            desc: "Bangunkan semua Minion. Biarkan mereka saling melihat.",
+            autoComplete: true,
+          });
+        }
+
+        if (
+          isFirstNight &&
+          players.some((p) => DEMONS.includes(p.actualRole) && p.isAlive)
+        ) {
+          steps.push({
+            type: "demon_info",
+            name: "Demon Info",
+            desc: "Bangunkan Demon. Tunjukkan siapa Minion-nya.",
+            autoComplete: true,
+          });
+        }
+
+        const poisoner = players.find(
+          (p) => p.actualRole === "Poisoner" && p.isAlive
+        );
+        if (poisoner)
+          steps.push({
+            type: "poisoner",
+            name: "Poisoner",
+            desc: "Pilih target untuk diracun.",
+          });
+
+        const spy = players.find((p) => p.actualRole === "Spy" && p.isAlive);
+        if (spy)
+          steps.push({
+            type: "spy",
+            name: "Spy",
+            desc: "Tunjukkan grimoire kepada Spy.",
+            autoComplete: true,
+          });
+
+        const fortuneTeller = players.find(
+          (p) => p.actualRole === "Fortune Teller" && p.isAlive
+        );
+        if (fortuneTeller)
+          steps.push({
+            type: "fortune_teller",
+            name: "Fortune Teller",
+            desc: "Pilih 2 pemain untuk diperiksa.",
+          });
+
+        const empath = players.find(
+          (p) => p.actualRole === "Empath" && p.isAlive
+        );
+        if (empath)
+          steps.push({
+            type: "empath",
+            name: "Empath",
+            desc: "Lihat jumlah tetangga jahat.",
+            autoExecute: true,
+          });
+
+        const washerwoman = players.find(
+          (p) => p.actualRole === "Washerwoman" && p.isAlive
+        );
+        if (isFirstNight && washerwoman)
+          steps.push({
+            type: "washerwoman",
+            name: "Washerwoman",
+            desc: "Lihat 2 pemain, salah satunya Townsfolk.",
+            autoExecute: true,
+          });
+
+        const librarian = players.find(
+          (p) => p.actualRole === "Librarian" && p.isAlive
+        );
+        if (isFirstNight && librarian)
+          steps.push({
+            type: "librarian",
+            name: "Librarian",
+            desc: "Lihat 2 pemain, salah satunya Outsider.",
+            autoExecute: true,
+          });
+
+        const investigator = players.find(
+          (p) => p.actualRole === "Investigator" && p.isAlive
+        );
+        if (isFirstNight && investigator)
+          steps.push({
+            type: "investigator",
+            name: "Investigator",
+            desc: "Lihat 2 pemain, salah satunya Minion.",
+            autoExecute: true,
+          });
+
+        const chef = players.find((p) => p.actualRole === "Chef" && p.isAlive);
+        if (isFirstNight && chef)
+          steps.push({
+            type: "chef",
+            name: "Chef",
+            desc: "Hitung pasangan tetangga jahat.",
+            autoExecute: true,
+          });
+
+        // MONK - Sebelum Demon Kill (sesuai permintaan)
+        const monk = players.find((p) => p.actualRole === "Monk" && p.isAlive);
+        if (monk)
+          steps.push({
+            type: "monk",
+            name: "Monk",
+            desc: "Pilih 1 pemain untuk dilindungi.",
+          });
+
+        // DEMON KILL - Setelah Monk
+        const aliveDemons = players.filter(
+          (p) => DEMONS.includes(p.actualRole) && p.isAlive
+        );
+        aliveDemons.forEach((demon) => {
+          steps.push({
+            type: "demon_kill",
+            name: `${demon.actualRole} Kill (${demon.name})`,
+            desc: `Pilih target untuk dibunuh.`,
+            demonId: demon.id,
+          });
+        });
+
+        const undertaker = players.find(
+          (p) => p.actualRole === "Undertaker" && p.isAlive
+        );
+        if (
+          undertaker &&
+          executionLogs.some((log) => log.includes("dieksekusi"))
+        ) {
+          steps.push({
+            type: "undertaker",
+            name: "Undertaker",
+            desc: "Lihat role yang dieksekusi kemarin.",
+            autoExecute: true,
+          });
+        }
+
+        if (necromancerPending) {
+          steps.push({
+            type: "necromancer",
+            name: "Necromancer",
+            desc: "Pilih Minion korban dan target baru untuk menjadi Demon.",
+          });
+        }
+
+        return steps;
+      }
+
+      // ==================== NIGHT PHASE RENDER ====================
+      function renderNightStep(step, stepIndex) {
+        const container = document.getElementById("nightStepsList");
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="step-container">
+                <div class="step-title">${step.name}</div>
+                <div class="step-desc">${step.desc}</div>
+                <div id="stepActions_${stepIndex}" class="step-actions"></div>
+                <div id="stepResult_${stepIndex}" class="info-box hidden"></div>
+            </div>
+        `;
+
+        const actionsDiv = document.getElementById(`stepActions_${stepIndex}`);
+        const resultDiv = document.getElementById(`stepResult_${stepIndex}`);
+
+        // Poisoner
+        if (step.type === "poisoner") {
+          const select = document.createElement("select");
+          select.id = "poisonerTarget";
+          select.innerHTML =
+            '<option value="">-- Pilih target racun --</option>' +
+            players
+              .filter((p) => p.isAlive && p.actualRole !== "Poisoner")
+              .map((p) => `<option value="${p.id}">${p.name}</option>`)
+              .join("");
+          const btn = document.createElement("button");
+          btn.innerHTML = "☠️ Racuni";
+          btn.onclick = () => {
+            const targetId = parseInt(select.value);
+            if (isNaN(targetId)) {
+              alert("Pilih target");
+              return;
+            }
+            const target = players.find((p) => p.id === targetId);
+            if (target) {
+              target.isPoisoned = true;
+              addNightLog(`Poisoner meracuni ${target.name}`);
+              resultDiv.innerHTML = `<div class="info-text">☠️ ${target.name} telah diracun!</div>`;
+              resultDiv.classList.remove("hidden");
+              btn.disabled = true;
+              select.disabled = true;
+            }
+          };
+          actionsDiv.appendChild(select);
+          actionsDiv.appendChild(btn);
+        }
+        // Fortune Teller
+        else if (step.type === "fortune_teller") {
+          const alivePlayers = players.filter((p) => p.isAlive);
+          const select1 = document.createElement("select");
+          select1.id = "ft1";
+          select1.innerHTML =
+            '<option value="">-- Pilih pemain 1 --</option>' +
+            alivePlayers
+              .map((p) => `<option value="${p.id}">${p.name}</option>`)
+              .join("");
+          const select2 = document.createElement("select");
+          select2.id = "ft2";
+          select2.innerHTML =
+            '<option value="">-- Pilih pemain 2 --</option>' +
+            alivePlayers
+              .map((p) => `<option value="${p.id}">${p.name}</option>`)
+              .join("");
+          const btn = document.createElement("button");
+          btn.innerHTML = "🔮 Info Me!";
+          btn.onclick = () => {
+            const id1 = parseInt(select1.value);
+            const id2 = parseInt(select2.value);
+            if (isNaN(id1) || isNaN(id2)) {
+              alert("Pilih 2 pemain");
+              return;
+            }
+            if (id1 === id2) {
+              alert("Pilih pemain berbeda");
+              return;
+            }
+            const p1 = players.find((p) => p.id === id1);
+            const p2 = players.find((p) => p.id === id2);
+            const ftPlayer = players.find(
+              (p) => p.actualRole === "Fortune Teller" && p.isAlive
+            );
+            const isPoisoned = isPlayerPoisonedOrDrunk(ftPlayer.id);
+            let hasDemon =
+              (DEMONS.includes(p1.actualRole) && p1.isAlive) ||
+              (DEMONS.includes(p2.actualRole) && p2.isAlive);
+            let result = hasDemon
+              ? "⚠️ ADA DEMON di antara mereka!"
+              : "✅ TIDAK ADA DEMON di antara mereka.";
+            if (isPoisoned) {
+              result = hasDemon
+                ? "✅ TIDAK ADA DEMON di antara mereka."
+                : "⚠️ ADA DEMON di antara mereka!";
+              addNightLog(
+                `Fortune Teller melihat ${p1.name} & ${p2.name} → ${result} (INFO SALAH karena poisoned)`
+              );
+            } else {
+              addNightLog(
+                `Fortune Teller melihat ${p1.name} & ${p2.name} → ${result}`
+              );
+            }
+            resultDiv.innerHTML = `<div class="info-text">🔮 ${result}</div>`;
+            resultDiv.classList.remove("hidden");
+            btn.disabled = true;
+            select1.disabled = true;
+            select2.disabled = true;
+          };
+          actionsDiv.appendChild(select1);
+          actionsDiv.appendChild(select2);
+          actionsDiv.appendChild(btn);
+        }
+        // Empath
+        else if (step.type === "empath") {
+          const empathPlayer = players.find(
+            (p) => p.actualRole === "Empath" && p.isAlive
+          );
+          if (empathPlayer) {
+            const trueCount = getAdjacentEvilCount(empathPlayer.id);
+            const isPoisoned = isPlayerPoisonedOrDrunk(empathPlayer.id);
+            const displayCount = isPoisoned
+              ? trueCount === 0
+                ? 1
+                : trueCount === 1
+                ? 0
+                : trueCount === 2
+                ? 1
+                : 0
+              : trueCount;
+            const resultText = isPoisoned
+              ? `Jumlah tetangga jahat: ${displayCount}`
+              : `Jumlah tetangga jahat: ${displayCount}`;
+            addNightLog(`Empath (${empathPlayer.name}) → ${resultText}`);
+            resultDiv.innerHTML = `<div class="info-text">👂 ${resultText}</div>`;
+            resultDiv.classList.remove("hidden");
+          }
+        }
+        // Washerwoman
+        else if (step.type === "washerwoman") {
+          const wwPlayer = players.find(
+            (p) => p.actualRole === "Washerwoman" && p.isAlive
+          );
+          if (wwPlayer) {
+            const randomTownsfolk = getRandomTownsfolk();
+            const randomOther = getRandomAlivePlayers(1, [
+              randomTownsfolk?.id,
+              wwPlayer.id,
+            ])[0];
+            const isPoisoned = isPlayerPoisonedOrDrunk(wwPlayer.id);
+            let result = `Salah satu dari ${randomTownsfolk?.name} dan ${randomOther?.name} adalah Townsfolk.`;
+            if (isPoisoned) {
+              const fake = getRandomMinion() || getRandomOutsider();
+              result = `Salah satu dari ${fake?.name} dan ${randomOther?.name} adalah Townsfolk. (INFO SALAH)`;
+            }
+            addNightLog(`Washerwoman (${wwPlayer.name}) → ${result}`);
+            resultDiv.innerHTML = `<div class="info-text">🧼 ${result}</div>`;
+            resultDiv.classList.remove("hidden");
+          }
+        }
+        // Librarian
+        else if (step.type === "librarian") {
+          const libPlayer = players.find(
+            (p) => p.actualRole === "Librarian" && p.isAlive
+          );
+          if (libPlayer) {
+            const randomOutsider = getRandomOutsider();
+            const randomOther = getRandomAlivePlayers(1, [
+              randomOutsider?.id,
+              libPlayer.id,
+            ])[0];
+            const isPoisoned = isPlayerPoisonedOrDrunk(libPlayer.id);
+            let result = `Salah satu dari ${randomOutsider?.name} dan ${randomOther?.name} adalah Outsider.`;
+            if (isPoisoned) {
+              const fake = getRandomTownsfolk() || getRandomMinion();
+              result = `Salah satu dari ${fake?.name} dan ${randomOther?.name} adalah Outsider. (INFO SALAH)`;
+            }
+            addNightLog(`Librarian (${libPlayer.name}) → ${result}`);
+            resultDiv.innerHTML = `<div class="info-text">📚 ${result}</div>`;
+            resultDiv.classList.remove("hidden");
+          }
+        }
+        // Investigator
+        else if (step.type === "investigator") {
+          const invPlayer = players.find(
+            (p) => p.actualRole === "Investigator" && p.isAlive
+          );
+          if (invPlayer) {
+            const randomMinion = getRandomMinion();
+            const randomOther = getRandomAlivePlayers(1, [
+              randomMinion?.id,
+              invPlayer.id,
+            ])[0];
+            const isPoisoned = isPlayerPoisonedOrDrunk(invPlayer.id);
+            let result = `Salah satu dari ${randomMinion?.name} dan ${randomOther?.name} adalah Minion.`;
+            if (isPoisoned) {
+              const fake = getRandomTownsfolk() || getRandomOutsider();
+              result = `Salah satu dari ${fake?.name} dan ${randomOther?.name} adalah Minion. (INFO SALAH)`;
+            }
+            addNightLog(`Investigator (${invPlayer.name}) → ${result}`);
+            resultDiv.innerHTML = `<div class="info-text">🔍 ${result}</div>`;
+            resultDiv.classList.remove("hidden");
+          }
+        }
+        // Chef
+        else if (step.type === "chef") {
+          const chefPlayer = players.find(
+            (p) => p.actualRole === "Chef" && p.isAlive
+          );
+          if (chefPlayer) {
+            const pairCount = getAdjacentEvilPairs();
+            const isPoisoned = isPlayerPoisonedOrDrunk(chefPlayer.id);
+            const displayCount = isPoisoned
+              ? Math.min(pairCount + 1, 5)
+              : pairCount;
+            addNightLog(
+              `Chef (${chefPlayer.name}) → ${displayCount} pasangan tetangga jahat`
+            );
+            resultDiv.innerHTML = `<div class="info-text">🍳 Jumlah pasangan tetangga jahat: ${displayCount}</div>`;
+            resultDiv.classList.remove("hidden");
+          }
+        }
+        // Monk
+        else if (step.type === "monk") {
+          const monkPlayer = players.find(
+            (p) => p.actualRole === "Monk" && p.isAlive
+          );
+          if (monkPlayer) {
+            const select = document.createElement("select");
+            select.id = "monkTarget";
+            select.innerHTML =
+              '<option value="">-- Pilih target lindungi --</option>' +
+              players
+                .filter((p) => p.isAlive && p.id !== monkPlayer.id)
+                .map((p) => `<option value="${p.id}">${p.name}</option>`)
+                .join("");
+            const btn = document.createElement("button");
+            btn.innerHTML = "🛡️ Lindungi";
+            btn.onclick = () => {
+              const targetId = parseInt(select.value);
+              if (isNaN(targetId)) {
+                alert("Pilih target");
+                return;
+              }
+              protectedPlayerId = targetId;
+              const target = players.find((p) => p.id === targetId);
+              addNightLog(
+                `Monk (${monkPlayer.name}) melindungi ${target.name}`
+              );
+              resultDiv.innerHTML = `<div class="info-text">🛡️ ${target.name} dilindungi!</div>`;
+              resultDiv.classList.remove("hidden");
+              btn.disabled = true;
+              select.disabled = true;
+              document.getElementById(
+                "monkStatus"
+              ).innerHTML = `🛡️ ${target.name} dilindungi malam ini.`;
+            };
+            actionsDiv.appendChild(select);
+            actionsDiv.appendChild(btn);
+          }
+        }
+        // Demon Kill
+        else if (step.type === "demon_kill") {
+          const demonPlayer = players.find(
+            (p) => p.id === step.demonId && p.isAlive
+          );
+          if (demonPlayer) {
+            const demonData = demonsInGame.find(
+              (d) => d.playerId === demonPlayer.id
+            );
+            const isPo = demonPlayer.actualRole === "Po";
+            const isCharged = isPo && demonData && demonData.poCharged;
+
+            if (isPo && isCharged) {
+              const containerDiv = document.createElement("div");
+              containerDiv.style.width = "100%";
+              containerDiv.innerHTML = `
+                        <p style="color:#f39c12;">⚡ PO CHARGE! Pilih 3 target:</p>
+                        <select id="poKill1" style="width:100%; margin:5px 0;"><option value="">-- Target 1 --</option>${players
+                          .filter((p) => p.isAlive && p.id !== demonPlayer.id)
+                          .map(
+                            (p) => `<option value="${p.id}">${p.name}</option>`
+                          )
+                          .join("")}</select>
+                        <select id="poKill2" style="width:100%; margin:5px 0;"><option value="">-- Target 2 --</option>${players
+                          .filter((p) => p.isAlive && p.id !== demonPlayer.id)
+                          .map(
+                            (p) => `<option value="${p.id}">${p.name}</option>`
+                          )
+                          .join("")}</select>
+                        <select id="poKill3" style="width:100%; margin:5px 0;"><option value="">-- Target 3 --</option>${players
+                          .filter((p) => p.isAlive && p.id !== demonPlayer.id)
+                          .map(
+                            (p) => `<option value="${p.id}">${p.name}</option>`
+                          )
+                          .join("")}</select>
+                    `;
+              const btn = document.createElement("button");
+              btn.innerHTML = "💀 Kill";
+              btn.onclick = () => {
+                const targets = [
+                  parseInt(containerDiv.querySelector("#poKill1").value),
+                  parseInt(containerDiv.querySelector("#poKill2").value),
+                  parseInt(containerDiv.querySelector("#poKill3").value),
+                ];
+                const valid = targets.filter((t) => !isNaN(t));
+                if (valid.length !== 3) {
+                  alert("Pilih 3 target berbeda");
+                  return;
+                }
+                if (
+                  valid[0] === valid[1] ||
+                  valid[0] === valid[2] ||
+                  valid[1] === valid[2]
+                ) {
+                  alert("Target harus berbeda");
+                  return;
+                }
+                valid.forEach((targetId) => {
+                  if (targetId === protectedPlayerId) {
+                    addNightLog(
+                      `${demonPlayer.name} mencoba bunuh ${
+                        players.find((p) => p.id === targetId).name
+                      } tapi dilindungi Monk!`
+                    );
+                  } else {
+                    const target = players.find((p) => p.id === targetId);
+                    if (target && target.isAlive) {
+                      target.isAlive = false;
+                      killedByDemon.push({
+                        id: target.id,
+                        name: target.name,
+                        role: target.actualRole,
+                        isSaint: target.isSaint,
+                      });
+                      addNightLog(
+                        `${demonPlayer.name} (Po) membunuh ${target.name}`
+                      );
+                    }
+                  }
+                });
+                if (demonData) {
+                  demonData.poLastNightKilled = true;
+                  demonData.poCharged = false;
+                }
+                updateDeadByDemonList();
+                btn.disabled = true;
+                resultDiv.innerHTML = `<div class="info-text">💀 Po membunuh 3 orang!</div>`;
+                resultDiv.classList.remove("hidden");
+              };
+              actionsDiv.appendChild(containerDiv);
+              actionsDiv.appendChild(btn);
+            } else {
+              const select = document.createElement("select");
+              select.id = `demonKill_${demonPlayer.id}`;
+              select.innerHTML =
+                '<option value="">-- Pilih target --</option>' +
+                players
+                  .filter((p) => p.isAlive && p.id !== demonPlayer.id)
+                  .map((p) => `<option value="${p.id}">${p.name}</option>`)
+                  .join("");
+              const btn = document.createElement("button");
+              btn.innerHTML = "💀 Kill";
+              btn.onclick = () => {
+                const targetId = parseInt(select.value);
+                if (isNaN(targetId)) {
+                  alert("Pilih target");
+                  return;
+                }
+                if (targetId === protectedPlayerId) {
+                  addNightLog(
+                    `${demonPlayer.name} mencoba bunuh ${
+                      players.find((p) => p.id === targetId).name
+                    } tapi dilindungi Monk!`
+                  );
+                } else {
+                  const target = players.find((p) => p.id === targetId);
+                  if (target && target.isAlive) {
+                    target.isAlive = false;
+                    killedByDemon.push({
+                      id: target.id,
+                      name: target.name,
+                      role: target.actualRole,
+                      isSaint: target.isSaint,
+                    });
+                    addNightLog(
+                      `${demonPlayer.name} (${demonPlayer.actualRole}) membunuh ${target.name}`
+                    );
+                  }
+                }
+                if (isPo && demonData) demonData.poLastNightKilled = true;
+                updateDeadByDemonList();
+                btn.disabled = true;
+                select.disabled = true;
+                resultDiv.innerHTML = `<div class="info-text">💀 ${demonPlayer.name} membunuh 1 orang!</div>`;
+                resultDiv.classList.remove("hidden");
+
+                if (isPo && demonData) {
+                  const chargeBtn = document.createElement("button");
+                  chargeBtn.innerHTML = "⏸ Tidak Bunuh (Charge)";
+                  chargeBtn.className = "secondary";
+                  chargeBtn.onclick = () => {
+                    demonData.poLastNightKilled = false;
+                    addNightLog(`${demonPlayer.name} (Po) memilih CHARGE!`);
+                    resultDiv.innerHTML = `<div class="info-text">⚡ ${demonPlayer.name} charge! Malam depan bisa bunuh 3 orang.</div>`;
+                    btn.disabled = true;
+                    chargeBtn.disabled = true;
+                  };
+                  actionsDiv.appendChild(chargeBtn);
+                }
+              };
+              actionsDiv.appendChild(select);
+              actionsDiv.appendChild(btn);
+
+              if (isPo && demonData) {
+                const chargeBtn = document.createElement("button");
+                chargeBtn.innerHTML = "⏸ Tidak Bunuh (Charge)";
+                chargeBtn.className = "secondary";
+                chargeBtn.onclick = () => {
+                  demonData.poLastNightKilled = false;
+                  addNightLog(`${demonPlayer.name} (Po) memilih CHARGE!`);
+                  resultDiv.innerHTML = `<div class="info-text">⚡ ${demonPlayer.name} charge! Malam depan bisa bunuh 3 orang.</div>`;
+                  btn.disabled = true;
+                  chargeBtn.disabled = true;
+                };
+                actionsDiv.appendChild(chargeBtn);
+              }
+            }
+          }
+        }
+        // Necromancer
+        else if (step.type === "necromancer") {
+          const necromancerPlayer = players.find(
+            (p) => p.actualRole === "Necromancer" && p.isAlive
+          );
+          if (necromancerPlayer && necromancerPending) {
+            const aliveMinions = players.filter(
+              (p) =>
+                MINIONS.includes(p.actualRole) &&
+                p.isAlive &&
+                p.id !== necromancerPlayer.id
+            );
+            const aliveTownsfolk = players.filter(
+              (p) => TOWNSFOLK.includes(p.actualRole) && p.isAlive
+            );
+
+            if (aliveMinions.length === 0 || aliveTownsfolk.length === 0) {
+              resultDiv.innerHTML = `<div class="info-text">Tidak ada Minion atau Townsfolk yang tersedia! Necromancer gagal.</div>`;
+              resultDiv.classList.remove("hidden");
+              necromancerPending = false;
+            } else {
+              const minionSelect = document.createElement("select");
+              minionSelect.id = "necromancerMinion";
+              minionSelect.innerHTML =
+                '<option value="">-- Pilih Minion korban --</option>' +
+                aliveMinions
+                  .map(
+                    (p) =>
+                      `<option value="${p.id}">${p.name} (${p.actualRole})</option>`
+                  )
+                  .join("");
+              const townSelect = document.createElement("select");
+              townSelect.id = "necromancerTown";
+              townSelect.innerHTML =
+                '<option value="">-- Pilih target jadi Demon --</option>' +
+                aliveTownsfolk
+                  .map((p) => `<option value="${p.id}">${p.name}</option>`)
+                  .join("");
+              const btn = document.createElement("button");
+              btn.innerHTML = "💀 Ubah Jadi Demon";
+              btn.onclick = () => {
+                const minionId = parseInt(minionSelect.value);
+                const townId = parseInt(townSelect.value);
+                if (isNaN(minionId) || isNaN(townId)) {
+                  alert("Pilih Minion dan target");
+                  return;
+                }
+
+                const minion = players.find((p) => p.id === minionId);
+                const targetTown = players.find((p) => p.id === townId);
+
+                if (minion && targetTown) {
+                  necromancerUsed = true;
+                  necromancerPending = false;
+
+                  minion.isAlive = false;
+                  addToDeadList(minion.name);
+                  addNightLog(
+                    `Necromancer mengorbankan ${minion.name} (${minion.actualRole})`
+                  );
+
+                  const oldRole = targetTown.actualRole;
+                  targetTown.actualRole =
+                    necromancerTargetDemonType === "Imp" ? "Imp" : "Po";
+                  targetTown.displayedRole = targetTown.actualRole;
+                  addNightLog(
+                    `✨ ${targetTown.name} (${oldRole}) menjadi ${targetTown.actualRole}!`
+                  );
+
+                  if (targetTown.actualRole === "Imp") {
+                    demonsInGame.push({
+                      playerId: targetTown.id,
+                      demonType: "Imp",
+                      poCharged: false,
+                      poLastNightKilled: true,
+                    });
+                  } else {
+                    demonsInGame.push({
+                      playerId: targetTown.id,
+                      demonType: "Po",
+                      poCharged: false,
+                      poLastNightKilled: true,
+                    });
+                  }
+
+                  necromancerPlayer.isAlive = false;
+                  addToDeadList(necromancerPlayer.name);
+
+                  showPopup(
+                    `${minion.name} mati!\n${targetTown.name} menjadi ${targetTown.actualRole}!`,
+                    "💀 NECROMANCER"
+                  );
+                  resultDiv.innerHTML = `<div class="info-text">✅ Necromancer selesai! ${targetTown.name} menjadi ${targetTown.actualRole}.</div>`;
+                  resultDiv.classList.remove("hidden");
+                  btn.disabled = true;
+                  minionSelect.disabled = true;
+                  townSelect.disabled = true;
+                  updateGrimoireAndDayDeadList();
+                  updateLiveStatus();
+                  checkWinCondition();
+                }
+              };
+              actionsDiv.appendChild(minionSelect);
+              actionsDiv.appendChild(townSelect);
+              actionsDiv.appendChild(btn);
+            }
+          }
+        }
+        // Auto-complete steps
+        else if (step.autoComplete || step.autoExecute) {
+          resultDiv.innerHTML = `<div class="info-text">✅ Step selesai. Lanjut ke step berikutnya.</div>`;
+          resultDiv.classList.remove("hidden");
+        }
+        // Default
+        else {
+          resultDiv.innerHTML = `<div class="info-text">✅ Step selesai. Lanjut ke step berikutnya.</div>`;
+          resultDiv.classList.remove("hidden");
+        }
+      }
+
+      function updateDeadByDemonList() {
+        const container = document.getElementById("deadByDemonContainer");
+        if (killedByDemon.length === 0) {
+          container.innerHTML = "Belum ada yang mati malam ini";
+        } else {
+          container.innerHTML = killedByDemon
+            .map((k) => `<div>💀 ${k.name}</div>`)
+            .join("");
+        }
+      }
+
+      function processSaintEffect() {
+        killedByDemon.forEach((killed) => {
+          if (killed.isSaint) {
+            const aliveMinions = players.filter(
+              (p) => MINIONS.includes(p.actualRole) && p.isAlive
+            );
+            if (aliveMinions.length > 0) {
+              const randomMinion =
+                aliveMinions[Math.floor(Math.random() * aliveMinions.length)];
+              randomMinion.isAlive = false;
+              addToDeadList(randomMinion.name);
+              addNightLog(
+                `⚠️ SAINT (${killed.name}) dibunuh Demon! Minion ${randomMinion.name} mati!`
+              );
+            } else {
+              addNightLog(
+                `⚠️ SAINT (${killed.name}) dibunuh Demon, tapi tidak ada Minion!`
+              );
+            }
+          }
+        });
+      }
+
+      function startNight() {
+        if (isNightStarted) return;
+        isNightStarted = true;
+        currentNightSteps = buildNightSteps();
+        currentStepIndex = 0;
+        killedByDemon = [];
+        protectedPlayerId = null;
+        updateDeadByDemonList();
+
+        addNightLog(`🌙 MALAM ${currentNight} DIMULAI`);
+        document.getElementById("startNightBtn").disabled = true;
+        document
+          .getElementById("nightStepsContainer")
+          .classList.remove("hidden");
+        document.getElementById("nightEndBtn").disabled = false;
+
+        demonsInGame.forEach((demon) => {
+          if (demon.demonType === "Po") {
+            const poPlayer = players.find((p) => p.id === demon.playerId);
+            if (poPlayer && poPlayer.isAlive) {
+              if (demon.poLastNightKilled === false) {
+                demon.poCharged = true;
+                addNightLog(
+                  `⚡ Po (${poPlayer.name}) TERCHARGE! Bisa bunuh 3 orang!`
+                );
+              } else {
+                demon.poCharged = false;
+              }
+            }
+          }
+        });
+
+        renderCurrentNightStep();
+        updatePoChargeStatus();
+      }
+
+      function renderCurrentNightStep() {
+        if (currentStepIndex >= currentNightSteps.length) return;
+        const step = currentNightSteps[currentStepIndex];
+        renderNightStep(step, currentStepIndex);
+      }
+
+      function nextNightStep() {
+        if (currentStepIndex < currentNightSteps.length - 1) {
+          currentStepIndex++;
+          renderCurrentNightStep();
+        } else {
+          alert("Semua step selesai! Klik NIGHT END.");
+        }
+      }
+
+      function nightEnd() {
+        if (!isNightStarted) return;
+
+        processSaintEffect();
+
+        const killedPlayers = [...killedByDemon];
+
+        killedByDemon.forEach((killed) => {
+          const player = players.find((p) => p.id === killed.id);
+          if (player && player.isAlive) {
+            player.isAlive = false;
+            addToDeadList(player.name);
+          }
+        });
+
+        players.forEach((p) => {
+          p.isPoisoned = false;
+        });
+
+        // Ravenkeeper check
+        for (const killed of killedPlayers) {
+          const killedPlayer = players.find((p) => p.id === killed.id);
+          if (
+            killedPlayer &&
+            killedPlayer.actualRole === "Ravenkeeper" &&
+            !ravenkeeperUsed
+          ) {
+            ravenkeeperUsed = true;
+            showPopup(
+              `${killedPlayer.name} (Ravenkeeper) mati! Bisa lihat role 1 pemain.`,
+              "👁️ RAVENKEEPER MATI"
+            );
+            const alivePlayersList = players.filter((p) => p.isAlive);
+            const selectHtml = alivePlayersList
+              .map((p) => `<option value="${p.id}">${p.name}</option>`)
+              .join("");
+            const modal = document.createElement("div");
+            modal.className = "modal";
+            modal.innerHTML = `
+                    <div class="modal-content">
+                        <h2 style="color:#e94560;">👁️ RAVENKEEPER MATI!</h2>
+                        <p>${killedPlayer.name} (Ravenkeeper) mati. Pilih 1 pemain untuk dilihat rolenya:</p>
+                        <select id="rkTarget" style="width:100%; margin:15px 0;">${selectHtml}</select>
+                        <button id="rkConfirmBtn" class="success">Lihat Role</button>
+                    </div>
+                `;
+            document.body.appendChild(modal);
+            document.getElementById("rkConfirmBtn").onclick = () => {
+              const targetId = parseInt(
+                document.getElementById("rkTarget").value
+              );
+              if (!isNaN(targetId)) {
+                const target = players.find((p) => p.id === targetId);
+                if (target) {
+                  showPopup(
+                    `${target.name} adalah ${target.actualRole}!`,
+                    "👁️ HASIL RAVENKEEPER"
+                  );
+                  addExecutionLog(
+                    `Ravenkeeper (${killedPlayer.name}) melihat role ${target.name}: ${target.actualRole}`
+                  );
+                }
+              }
+              modal.remove();
+            };
+            break;
+          }
+        }
+
+        // Scarlet Woman check (Imp mati)
+        const deadImp = killedPlayers.find((k) => {
+          const p = players.find((p) => p.id === k.id);
+          return p && p.actualRole === "Imp";
+        });
+        if (deadImp && !scarletWomanUsed) {
+          const impPlayer = players.find((p) => p.id === deadImp.id);
+          if (impPlayer) {
+            const activated = activateScarletWoman(impPlayer.name);
+            if (!activated) {
+              queueNecromancer("Imp");
+            }
+          } else {
+            queueNecromancer("Imp");
+          }
+        }
+
+        // Necromancer check for Po
+        const deadPo = killedPlayers.find((k) => {
+          const p = players.find((p) => p.id === k.id);
+          return p && p.actualRole === "Po";
+        });
+        if (deadPo && !necromancerUsed) {
+          queueNecromancer("Po");
+        }
+
+        isNightStarted = false;
+        isDayPhase = true;
+        currentDay = currentNight;
+
+        addNightLog(
+          `🏁 MALAM ${currentNight} SELESAI. ${killedByDemon.length} orang mati.`
+        );
+        document.getElementById("phaseIndicator").innerHTML = "☀️ SIANG HARI";
+        document
+          .getElementById("nightPhaseToggleBtn")
+          .classList.remove("active");
+        document.getElementById("dayPhaseToggleBtn").classList.add("active");
+        document.getElementById("nightPhaseContent").classList.add("hidden");
+        document.getElementById("dayPhaseContent").classList.remove("hidden");
+
+        updateGrimoireAndDayDeadList();
+        updateLiveStatus();
+        updateDropdowns();
+        updateSlayerSection();
+        updateDeadPlayersInfo();
+        updatePoChargeStatus();
+        updateNecromancerStatus();
+        updateThresholdInfo();
+
+        checkWinCondition();
+        alert(`Malam ${currentNight} selesai. Beralih ke Siang ${currentDay}.`);
+      }
+
+      // ==================== SLAYER ====================
+      function updateSlayerSection() {
+        const slayer = players.find(
+          (p) => p.actualRole === "Slayer" && p.isAlive
+        );
+        const container = document.getElementById("slayerContent");
+        if (!container) return;
+
+        if (slayer && !slayerUsed) {
+          const alivePlayers = players.filter(
+            (p) => p.isAlive && p.id !== slayer.id
+          );
+          container.innerHTML = `
+                <select id="slayerTarget" style="width:100%; margin-bottom:10px;">
+                    <option value="">-- Pilih target --</option>
+                    ${alivePlayers
+                      .map((p) => `<option value="${p.id}">${p.name}</option>`)
+                      .join("")}
+                </select>
+                <button id="slayerShootBtn" class="warning">🏹 TEMBAK!</button>
+                <div id="slayerResult" class="info-box hidden"></div>
+            `;
+          const shootBtn = document.getElementById("slayerShootBtn");
+          if (shootBtn) {
+            shootBtn.onclick = () => {
+              const targetId = parseInt(
+                document.getElementById("slayerTarget").value
+              );
+              if (isNaN(targetId)) {
+                alert("Pilih target");
+                return;
+              }
+              const target = players.find((p) => p.id === targetId);
+              const resultDiv = document.getElementById("slayerResult");
+              slayerUsed = true;
+
+              if (target.isRecluse) {
+                resultDiv.innerHTML = `<div class="info-text">🔮 ${target.name} adalah RECLUSE! Gagal.</div>`;
+                addExecutionLog(
+                  `Slayer (${slayer.name}) menembak ${target.name} (Recluse) - GAGAL!`
+                );
+              } else if (DEMONS.includes(target.actualRole)) {
+                target.isAlive = false;
+                addToDeadList(target.name);
+                addExecutionLog(
+                  `Slayer (${slayer.name}) menembak ${target.name} (${target.actualRole}) - DEMON MATI!`
+                );
+                resultDiv.innerHTML = `<div class="info-text">🏹 HEADSHOT! ${target.name} (${target.actualRole}) mati!</div>`;
+                updateGrimoireAndDayDeadList();
+                updateLiveStatus();
+                updateThresholdInfo();
+                checkWinCondition();
+              } else {
+                addExecutionLog(
+                  `Slayer (${slayer.name}) menembak ${target.name} (${target.actualRole}) - GAGAL!`
+                );
+                resultDiv.innerHTML = `<div class="info-text">💨 ${target.name} bukan Demon!</div>`;
+              }
+              resultDiv.classList.remove("hidden");
+              document.getElementById("slayerTarget").disabled = true;
+              shootBtn.disabled = true;
+            };
+          }
+        } else if (slayer && slayerUsed) {
+          container.innerHTML = `<div class="info-text">🏹 Slayer sudah menggunakan kemampuannya.</div>`;
+        } else {
+          container.innerHTML = `<div class="info-text">Tidak ada Slayer yang hidup.</div>`;
+        }
+      }
+
+      // ==================== DAY PHASE ====================
+      function addNominasi() {
+        const nominatorId = parseInt(
+          document.getElementById("nominatorSelect").value
+        );
+        const targetId = parseInt(
+          document.getElementById("targetSelect").value
+        );
+        if (isNaN(nominatorId) || isNaN(targetId)) {
+          alert("Pilih nominator dan tertuduh");
+          return;
+        }
+        if (nominatorId === targetId) {
+          alert("Tidak bisa nominasi diri sendiri");
+          return;
+        }
+        const nominator = players.find((p) => p.id === nominatorId);
+        const target = players.find((p) => p.id === targetId);
+        nominations.push({
+          id: nominations.length,
+          nominatorId,
+          nominatorName: nominator.name,
+          targetId,
+          targetName: target.name,
+          votes: 0,
+        });
+        updateNominasiTable();
+        updateVoteNominasiSelect();
+        alert(`Nominasi: ${nominator.name} → ${target.name}`);
+      }
+
+      window.selectForVote = function (nomId) {
+        document.getElementById("voteNominasiSelect").value = nomId;
+        const nom = nominations.find((n) => n.id === nomId);
+        if (nom) document.getElementById("voteCountInput").value = nom.votes;
+        updateThresholdInfo();
+      };
+
+      function saveVote() {
+        const nomId = parseInt(
+          document.getElementById("voteNominasiSelect").value
+        );
+        const votes = parseInt(document.getElementById("voteCountInput").value);
+        if (isNaN(nomId)) {
+          alert("Pilih nominasi");
+          return;
+        }
+        if (isNaN(votes)) {
+          alert("Masukkan suara");
+          return;
+        }
+        const nom = nominations.find((n) => n.id === nomId);
+        if (nom) {
+          nom.votes = votes;
+          updateNominasiTable();
+          alert("Suara disimpan");
+        }
+      }
+
+      function execute() {
+        const nomId = parseInt(
+          document.getElementById("voteNominasiSelect").value
+        );
+        if (isNaN(nomId)) {
+          alert("Pilih nominasi");
+          return;
+        }
+        const nom = nominations.find((n) => n.id === nomId);
+        if (!nom) return;
+
+        const aliveCount = getAliveCount();
+        const needed = Math.floor(aliveCount / 2) + 1;
+        if (nom.votes < needed) {
+          alert(
+            `Suara kurang! Butuh ${needed} dari ${aliveCount} pemain hidup`
+          );
+          return;
+        }
+
+        const target = players.find((p) => p.id === nom.targetId);
+        const nominator = players.find((p) => p.id === nom.nominatorId);
+
+        if (!target || !target.isAlive) {
+          alert("Target sudah mati");
+          return;
+        }
+
+        if (
+          virginActive &&
+          target.actualRole === "Virgin" &&
+          !target.hasUsedVirginAbility &&
+          nominator
+        ) {
+          const isGood =
+            getRoleCategory(nominator.actualRole) === "townsfolk" ||
+            getRoleCategory(nominator.actualRole) === "outsider";
+          if (isGood && nominator.isAlive) {
+            addExecutionLog(
+              `VIRGIN TERPICU! ${nominator.name} dieksekusi karena menominasi Virgin (${target.name})`
+            );
+            nominator.isAlive = false;
+            addToDeadList(nominator.name);
+            target.hasUsedVirginAbility = true;
+            virginActive = false;
+            updateGrimoireAndDayDeadList();
+            updateLiveStatus();
+            updateThresholdInfo();
+            alert(`VIRGIN TERPICU! ${nominator.name} dieksekusi!`);
+            checkWinCondition();
+            return;
+          }
+        }
+
+        if (target.isSaint) {
+          addExecutionLog(
+            `SAINT DIEKSEKUSI! ${target.name} mati! TIM JAHAT MENANG!`
+          );
+          target.isAlive = false;
+          addToDeadList(target.name);
+          updateGrimoireAndDayDeadList();
+          updateLiveStatus();
+          updateThresholdInfo();
+          showWinnerModal(
+            "evil",
+            `Saint (${target.name}) dieksekusi! Tim Jahat menang!`
+          );
+          return;
+        }
+
+        const wasImp = target.actualRole === "Imp";
+        const wasPo = target.actualRole === "Po";
+
+        addExecutionLog(
+          `Siang ${currentDay}: ${target.name} dieksekusi → role: ${target.actualRole}`
+        );
+        target.isAlive = false;
+        addToDeadList(target.name);
+        updateGrimoireAndDayDeadList();
+        updateLiveStatus();
+        updateThresholdInfo();
+
+        if (wasImp) {
+          const scarletActivated = activateScarletWoman(target.name);
+          if (!scarletActivated) {
+            queueNecromancer("Imp");
+          }
+        } else if (wasPo) {
+          queueNecromancer("Po");
+        }
+
+        alert(`${target.name} dieksekusi! Role: ${target.actualRole}`);
+        checkWinCondition();
+      }
+
+      function endDay() {
+        addExecutionLog(`🏁 SIANG ${currentDay} SELESAI`);
+        isDayPhase = false;
+        currentNight++;
+        isNightStarted = false;
+        nominations = [];
+        killedByDemon = [];
+        protectedPlayerId = null;
+        slayerUsed = false;
+
+        document.getElementById("phaseIndicator").innerHTML = "🌙 NIGHT PHASE";
+        document.getElementById("dayPhaseToggleBtn").classList.remove("active");
+        document.getElementById("nightPhaseToggleBtn").classList.add("active");
+        document.getElementById("dayPhaseContent").classList.add("hidden");
+        document.getElementById("nightPhaseContent").classList.remove("hidden");
+        document.getElementById("nightStepsContainer").classList.add("hidden");
+        document.getElementById("startNightBtn").disabled = false;
+        document.getElementById("nightEndBtn").disabled = true;
+        document.getElementById("nightNumberDisplay").innerHTML = currentNight;
+        document.getElementById("deadByDemonContainer").innerHTML =
+          "Belum ada yang mati";
+
+        updateGrimoireAndDayDeadList();
+        updateLiveStatus();
+        updateDropdowns();
+        updateSlayerSection();
+        updateDeadPlayersInfo();
+        updatePoChargeStatus();
+        updateNecromancerStatus();
+        updateThresholdInfo();
+        alert(
+          `Siang ${currentDay - 1} selesai. Beralih ke Malam ${currentNight}.`
+        );
+      }
+
+      // ==================== UI UPDATE ====================
+      function updateLiveStatus() {
+        const aliveDemons = players.filter(
+          (p) => DEMONS.includes(p.actualRole) && p.isAlive
+        );
+        const minions = players.filter(
+          (p) => MINIONS.includes(p.actualRole) && p.isAlive
+        );
+        const poisoned = players.filter((p) => p.isPoisoned && p.isAlive);
+        const drunk = players.filter((p) => p.isDrunk && p.isAlive);
+        const liveStatusDiv = document.getElementById("liveStatus");
+        if (liveStatusDiv) {
+          liveStatusDiv.innerHTML = `
+                <div class="live-info-row">🔴 Demon(s): ${
+                  aliveDemons
+                    .map((d) => `${d.name} (${d.actualRole})`)
+                    .join(", ") || "Tidak ada"
+                }</div>
+                <div class="live-info-row">🔴 Minion: ${
+                  minions.map((m) => m.name).join(", ") || "-"
+                }</div>
+                <div class="live-info-row">☠️ Poisoned: ${
+                  poisoned.map((p) => p.name).join(", ") || "-"
+                }</div>
+                <div class="live-info-row">🍺 Drunk: ${
+                  drunk.map((p) => p.name).join(", ") || "-"
+                }</div>
+                <div class="live-info-row">📊 Pemain hidup: ${getAliveCount()} / ${
+            players.length
+          }</div>
+                <div class="live-info-row">🌙 Malam ${currentNight} | Siang ${currentDay}</div>
+                ${
+                  hasTwoDemons
+                    ? '<div class="live-info-row" style="color:#e94560;">🔥 MODE 2 DEMON</div>'
+                    : ""
+                }
+            `;
+        }
+      }
+
+      function updatePoChargeStatus() {
+        const poDemon = demonsInGame.find((d) => d.demonType === "Po");
+        const poPlayer = poDemon
+          ? players.find((p) => p.id === poDemon.playerId)
+          : null;
+        const container = document.getElementById("poChargeStatus");
+        if (container) {
+          if (poDemon && poPlayer && poPlayer.isAlive) {
+            container.innerHTML = `⚡ Po Charge: ${
+              poDemon.poCharged
+                ? "🔴 TERCHARGE! (bisa bunuh 3)"
+                : "🟢 Normal (bunuh 1)"
+            }<br>📝 Malam lalu ${
+              poDemon.poLastNightKilled ? "membunuh" : "TIDAK membunuh"
+            }`;
+          } else {
+            container.innerHTML = "Tidak ada Po yang hidup";
+          }
+        }
+      }
+
+      function updateNecromancerStatus() {
+        const necromancer = players.find((p) => p.actualRole === "Necromancer");
+        const container = document.getElementById("necromancerStatus");
+        if (container) {
+          if (necromancer && necromancer.isAlive) {
+            container.innerHTML = `💀 Necromancer (${necromancer.name}) siap. Akan aktif jika Demon mati.`;
+          } else if (necromancer && !necromancer.isAlive) {
+            container.innerHTML = `💀 Necromancer sudah mati.`;
+          } else {
+            container.innerHTML = `Tidak ada Necromancer.`;
+          }
+        }
+      }
+
+      function updateDeadPlayersInfo() {
+        const dead = players.filter((p) => !p.isAlive);
+        const container = document.getElementById("deadPlayersInfo");
+        if (container) {
+          container.innerHTML =
+            dead
+              .map(
+                (p) => `
+                <div>💀 ${p.name} (${p.actualRole}) - Hak suara: ${
+                  p.usedGhostVote ? "habis" : "1 tersisa"
+                }</div>
+            `
+              )
+              .join("") || "Belum ada yang mati";
+        }
+      }
+
+      function updateVirginStatus() {
+        const virgin = players.find((p) => p.actualRole === "Virgin");
+        const container = document.getElementById("virginStatus");
+        if (container) {
+          if (!virginActive || !virgin || virgin.hasUsedVirginAbility) {
+            container.innerHTML = "🔴 Virgin sudah aktif";
+          } else {
+            container.innerHTML = `🟢 Virgin masih aktif - ${virgin.name}`;
+          }
+        }
+      }
+
+      function updateDropdowns() {
+        const alivePlayers = players.filter((p) => p.isAlive);
+        const aliveOptions = alivePlayers
+          .map((p) => `<option value="${p.id}">${p.name}</option>`)
+          .join("");
+        const nominatorSelect = document.getElementById("nominatorSelect");
+        const targetSelect = document.getElementById("targetSelect");
+        if (nominatorSelect)
+          nominatorSelect.innerHTML =
+            '<option value="">-- Pilih Nominator --</option>' + aliveOptions;
+        if (targetSelect)
+          targetSelect.innerHTML =
+            '<option value="">-- Pilih Tertuduh --</option>' + aliveOptions;
+      }
+
+      function updateNominasiTable() {
+        const tbody = document.getElementById("nominasiBody");
+        if (tbody) {
+          tbody.innerHTML = nominations
+            .map(
+              (n, idx) => `
+                <tr><td>${idx + 1}</td><td>${n.nominatorName}</td><td>${
+                n.targetName
+              }</td><td>${n.votes}</td>
+                <td><button onclick="selectForVote(${
+                  n.id
+                })" class="secondary" style="padding:4px 8px;">Vote</button></td></tr>
+            `
+            )
+            .join("");
+        }
+      }
+
+      function updateVoteNominasiSelect() {
+        const select = document.getElementById("voteNominasiSelect");
+        if (select) {
+          select.innerHTML =
+            '<option value="">-- Pilih Nominasi --</option>' +
+            nominations
+              .map(
+                (n) =>
+                  `<option value="${n.id}">#${n.id + 1} ${n.nominatorName} → ${
+                    n.targetName
+                  }</option>`
+              )
+              .join("");
+        }
+      }
+
+      function updateThresholdInfo() {
+        const aliveCount = getAliveCount();
+        const needed = Math.floor(aliveCount / 2) + 1;
+        const infoDiv = document.getElementById("thresholdInfo");
+        if (infoDiv)
+          infoDiv.innerHTML = `Pemain hidup: ${aliveCount} | Butuh minimal ${needed} suara untuk eksekusi`;
+      }
+
+      function checkWinCondition() {
+        if (gameWinner) return;
+        const aliveDemons = players.filter(
+          (p) => DEMONS.includes(p.actualRole) && p.isAlive
+        );
+        const aliveCount = getAliveCount();
+
+        if (hasTwoDemons) {
+          if (aliveDemons.length === 0) {
+            showWinnerModal(
+              "good",
+              "Kedua Demon (Imp dan Po) telah mati! Tim Baik menang!"
+            );
+            addExecutionLog("🎉 GAME OVER: Kedua Demon mati, Tim Baik menang!");
+          } else if (aliveCount <= 2) {
+            showWinnerModal(
+              "evil",
+              `Hanya ${aliveCount} pemain tersisa dengan Demon masih hidup! Tim Jahat menang!`
+            );
+            addExecutionLog(
+              "🧛 GAME OVER: Hanya 2 pemain tersisa, Tim Jahat menang!"
+            );
+          }
+        } else {
+          if (aliveDemons.length === 0) {
+            showWinnerModal("good", "Demon telah mati! Tim Baik menang!");
+            addExecutionLog("🎉 GAME OVER: Demon mati, Tim Baik menang!");
+          } else if (aliveCount <= 2) {
+            showWinnerModal(
+              "evil",
+              `Hanya ${aliveCount} pemain tersisa! Tim Jahat menang!`
+            );
+            addExecutionLog(
+              "🧛 GAME OVER: Hanya 2 pemain tersisa, Tim Jahat menang!"
+            );
+          }
+        }
+      }
+
+      function resetToSetup() {
+        if (confirm("Reset ke setup? Progress akan hilang.")) {
+          document.getElementById("setupScreen").classList.remove("hidden");
+          document.getElementById("gameDashboard").classList.add("hidden");
+          document.getElementById("phaseIndicator").innerHTML = "⚙️ SETUP GAME";
+          initNameInputs();
+        }
+      }
+
+      function saveGame() {
+        const gameState = {
+          players,
+          currentNight,
+          currentDay,
+          isDayPhase,
+          isNightStarted,
+          virginActive,
+          virginPlayerId,
+          nominations,
+          nightLogs,
+          executionLogs,
+          demonsInGame,
+          hasTwoDemons,
+          killedByDemon,
+          protectedPlayerId,
+          slayerUsed,
+          necromancerUsed,
+          ravenkeeperUsed,
+          scarletWomanUsed,
+          necromancerPending,
+          necromancerTargetDemonType,
+          gameWinner,
+        };
+        localStorage.setItem("clocktowerSave", JSON.stringify(gameState));
+        alert("Game disimpan!");
+      }
+
+      function loadGame() {
+        const saved = localStorage.getItem("clocktowerSave");
+        if (!saved) {
+          alert("Tidak ada save");
+          return;
+        }
+        const state = JSON.parse(saved);
+        players = state.players;
+        currentNight = state.currentNight;
+        currentDay = state.currentDay;
+        isDayPhase = state.isDayPhase;
+        isNightStarted = state.isNightStarted;
+        virginActive = state.virginActive;
+        virginPlayerId = state.virginPlayerId;
+        nominations = state.nominations || [];
+        nightLogs = state.nightLogs || [];
+        executionLogs = state.executionLogs || [];
+        demonsInGame = state.demonsInGame || [];
+        hasTwoDemons = state.hasTwoDemons || false;
+        killedByDemon = state.killedByDemon || [];
+        protectedPlayerId = state.protectedPlayerId || null;
+        slayerUsed = state.slayerUsed || false;
+        necromancerUsed = state.necromancerUsed || false;
+        ravenkeeperUsed = state.ravenkeeperUsed || false;
+        scarletWomanUsed = state.scarletWomanUsed || false;
+        necromancerPending = state.necromancerPending || false;
+        necromancerTargetDemonType = state.necromancerTargetDemonType || null;
+        gameWinner = state.gameWinner || null;
+
+        document.getElementById("setupScreen").classList.add("hidden");
+        document.getElementById("gameDashboard").classList.remove("hidden");
+        document.getElementById("phaseIndicator").innerHTML = isDayPhase
+          ? "☀️ SIANG HARI"
+          : "🌙 NIGHT PHASE";
+
+        if (isDayPhase) {
+          document
+            .getElementById("nightPhaseToggleBtn")
+            .classList.remove("active");
+          document.getElementById("dayPhaseToggleBtn").classList.add("active");
+          document.getElementById("nightPhaseContent").classList.add("hidden");
+          document.getElementById("dayPhaseContent").classList.remove("hidden");
+        } else {
+          document
+            .getElementById("dayPhaseToggleBtn")
+            .classList.remove("active");
+          document
+            .getElementById("nightPhaseToggleBtn")
+            .classList.add("active");
+          document.getElementById("dayPhaseContent").classList.add("hidden");
+          document
+            .getElementById("nightPhaseContent")
+            .classList.remove("hidden");
+        }
+
+        updateGrimoireAndDayDeadList();
+        updateLiveStatus();
+        updateDropdowns();
+        updateSlayerSection();
+        updateNominasiTable();
+        updateVoteNominasiSelect();
+        updateThresholdInfo();
+        updateDeadPlayersInfo();
+        updateVirginStatus();
+        updatePoChargeStatus();
+        updateNecromancerStatus();
+        alert("Game dimuat!");
+      }
+
+      // ==================== INIT ====================
+      function initNameInputs() {
+        const container = document.getElementById("playerNameInputs");
+        let nameList = Array(15)
+          .fill("")
+          .map((_, i) => `Murid ${i + 1}`);
+
+        function renderInputs() {
+          const count = parseInt(
+            document.getElementById("playerCountInput")?.value || 15
+          );
+          if (nameList.length !== count) {
+            if (nameList.length < count) {
+              for (let i = nameList.length; i < count; i++)
+                nameList.push(`Murid ${i + 1}`);
+            } else {
+              nameList = nameList.slice(0, count);
+            }
+          }
+          container.innerHTML = `
+                <div style="margin-bottom:15px;">
+                    <label>Jumlah Pemain (5-22): </label>
+                    <input type="number" id="playerCountInput" min="5" max="22" value="${count}" style="width:100px; margin-left:10px;">
+                    <span>${count} orang</span>
+                </div>
+                <div style="max-height:400px; overflow-y:auto;">
+                    ${nameList
+                      .map(
+                        (name, idx) => `
+                        <div class="player-input-row">
+                            <span style="width:30px;">${idx + 1}.</span>
+                            <input type="text" class="player-name-input" value="${escapeHtml(
+                              name
+                            )}" placeholder="Nama pemain ${idx + 1}">
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+            `;
+          const countInput = document.getElementById("playerCountInput");
+          countInput.onchange = () => {
+            let newCount = parseInt(countInput.value);
+            if (isNaN(newCount)) newCount = 15;
+            if (newCount < 5) newCount = 5;
+            if (newCount > 22) newCount = 22;
+            countInput.value = newCount;
+            if (newCount > nameList.length) {
+              for (let i = nameList.length; i < newCount; i++)
+                nameList.push(`Murid ${i + 1}`);
+            } else {
+              nameList = nameList.slice(0, newCount);
+            }
+            renderInputs();
+          };
+        }
+        renderInputs();
+      }
+
+      function escapeHtml(str) {
+        return str.replace(/[&<>]/g, (m) =>
+          m === "&" ? "&amp;" : m === "<" ? "&lt;" : "&gt;"
+        );
+      }
+
+      function savePlayerNames() {
+        const inputs = document.querySelectorAll(".player-name-input");
+        return Array.from(inputs).map(
+          (inp) => inp.value.trim() || `Murid ${inp.length + 1}`
+        );
+      }
+
+      function initTabs() {
+        document.querySelectorAll(".tab-btn").forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const tabId = tab.getAttribute("data-tab");
+            document
+              .querySelectorAll(".tab-btn")
+              .forEach((t) => t.classList.remove("active"));
+            tab.classList.add("active");
+            document
+              .querySelectorAll(".tab-content")
+              .forEach((content) => content.classList.remove("active"));
+            document.getElementById(`tab-${tabId}`).classList.add("active");
+          });
+        });
+      }
+
+      // Event Listeners
+      document
+        .getElementById("startRouletteBtn")
+        ?.addEventListener("click", () => {
+          savePlayerNames();
+          startRoulette();
+        });
+      document
+        .getElementById("resetNamesBtn")
+        ?.addEventListener("click", initNameInputs);
+      document
+        .getElementById("resetGameFromGameBtn")
+        ?.addEventListener("click", resetToSetup);
+      document
+        .getElementById("saveGameBtn")
+        ?.addEventListener("click", saveGame);
+      document
+        .getElementById("loadGameBtn")
+        ?.addEventListener("click", loadGame);
+      document
+        .getElementById("startNightBtn")
+        ?.addEventListener("click", startNight);
+      document
+        .getElementById("nightEndBtn")
+        ?.addEventListener("click", nightEnd);
+      document
+        .getElementById("nextStepBtn")
+        ?.addEventListener("click", nextNightStep);
+      document.getElementById("endDayBtn")?.addEventListener("click", endDay);
+      document
+        .getElementById("addNominasiBtn")
+        ?.addEventListener("click", addNominasi);
+      document
+        .getElementById("saveVoteBtn")
+        ?.addEventListener("click", saveVote);
+      document.getElementById("executeBtn")?.addEventListener("click", execute);
+      document
+        .getElementById("nightPhaseToggleBtn")
+        ?.addEventListener("click", () => {
+          if (isDayPhase) location.reload();
+        });
+      document
+        .getElementById("dayPhaseToggleBtn")
+        ?.addEventListener("click", () => {
+          if (!isDayPhase) location.reload();
+        });
+
+      initNameInputs();
+      initTabs();
+    </script>
+  </body>
+</html>
