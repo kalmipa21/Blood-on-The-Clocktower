@@ -215,6 +215,106 @@
         background: #6b0000;
       }
 
+      /* Role Details Grid - NEW */
+      .role-details {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 20px;
+      }
+
+      .role-category {
+        margin-bottom: 20px;
+      }
+
+      .role-category h4 {
+        color: #ffaa00;
+        margin-bottom: 10px;
+        font-size: 1rem;
+      }
+
+      .role-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+      }
+
+      .role-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-left: 3px solid #e94560;
+      }
+
+      .role-card:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(3px);
+      }
+
+      .role-name {
+        font-weight: bold;
+        font-size: 0.85rem;
+      }
+
+      .role-desc {
+        font-size: 0.7rem;
+        color: #aaa;
+        margin-top: 3px;
+      }
+
+      .role-detail-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .role-detail-content {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border-radius: 24px;
+        padding: 25px;
+        max-width: 450px;
+        width: 90%;
+        border: 2px solid #e94560;
+      }
+
+      .role-detail-name {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #ffaa00;
+      }
+
+      .role-detail-category {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        margin-bottom: 15px;
+      }
+
+      .role-detail-desc {
+        line-height: 1.6;
+        margin-bottom: 15px;
+      }
+
+      .role-detail-note {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        color: #aaa;
+        margin-top: 10px;
+      }
+
       .modal {
         position: fixed;
         top: 0;
@@ -407,6 +507,19 @@
         padding: 10px;
         margin-top: 10px;
       }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #e94560;
+        border-radius: 4px;
+      }
     </style>
   </head>
   <body>
@@ -431,57 +544,9 @@
             <button id="resetNamesBtn" class="secondary">🔄 Reset</button>
           </div>
         </div>
-        <div class="panel">
-          <h3>📚 Daftar Role</h3>
-          <div style="font-size: 0.8rem; color: #aaa">
-            <p>
-              <span class="badge badge-demon">Demon</span> (2): Imp, Po
-              <strong style="color: #f39c12"
-                >(untuk 18+ pemain, Imp dan Po HADIR BERSAMA!)</strong
-              >
-            </p>
-            <p>
-              <span class="badge badge-minion">Minion</span> (4): Poisoner, Spy,
-              Scarlet Woman, Necromancer
-            </p>
-            <p>
-              <span class="badge badge-outsider">Outsider</span> (3): Recluse,
-              Saint, Drunk
-            </p>
-            <p>
-              <span class="badge badge-townsfolk">Townsfolk</span> (13):
-              Washerwoman, Librarian, Investigator, Chef, Empath, Fortune
-              Teller, Undertaker, Monk, Ravenkeeper, Virgin, Slayer, Soldier,
-              Mayor
-            </p>
-            <p style="margin-top: 10px"><strong>Max pemain: 22</strong></p>
-            <p style="color: #f39c12">
-              <strong>⚡ Aturan Saint:</strong> Jika dibunuh Demon → 1 Minion
-              mati. Jika dieksekusi → Tim Baik kalah!
-            </p>
-            <p style="color: #f39c12">
-              <strong>⚡ Po:</strong> Jika tidak bunuh di malam sebelumnya, bisa
-              bunuh 3 orang di malam ini!
-            </p>
-            <p style="color: #e94560">
-              <strong>💀 Necromancer:</strong> Jika Demon mati, bisa
-              mengorbankan 1 Minion untuk mengubah pemain lain menjadi Demon
-              baru!
-            </p>
-            <p style="color: #e94560">
-              <strong>🏹 Slayer:</strong> Sekali sehari, bisa menembak Demon.
-              Jika kena Recluse, tidak mati.
-            </p>
-            <p style="color: #e94560">
-              <strong>👁️ Ravenkeeper:</strong> Jika mati di malam hari, bisa
-              melihat role 1 pemain.
-            </p>
-            <p style="color: #e94560">
-              <strong>🩸 Scarlet Woman:</strong> Jika Imp mati, dia menjadi Imp
-              baru.
-            </p>
-          </div>
-        </div>
+
+        <!-- ROLE DETAILS DI SETUP SCREEN - NEW -->
+        <div id="roleDetailsSetup" class="role-details"></div>
       </div>
 
       <!-- GAME DASHBOARD -->
@@ -515,6 +580,9 @@
               <button id="loadGameBtn" class="secondary">📂 Load Game</button>
             </div>
           </div>
+
+          <!-- ROLE DETAILS DI TAB GRIMOIRE - NEW -->
+          <div id="roleDetailsGrimoire" class="role-details"></div>
         </div>
 
         <!-- TAB 2: ACTIVITY -->
@@ -645,7 +713,246 @@
     </div>
 
     <script>
-      // ==================== DATA ====================
+      // ==================== ROLE DATABASE ====================
+      const ROLE_DETAILS = {
+        // Townsfolk
+        Washerwoman: {
+          category: "townsfolk",
+          desc: "Di malam pertama, tahu 2 pemain, salah satunya memiliki role Townsfolk tertentu.",
+          note: "Hanya aktif di malam 1.",
+        },
+        Librarian: {
+          category: "townsfolk",
+          desc: "Di malam pertama, tahu 2 pemain, salah satunya adalah Outsider.",
+          note: "Hanya aktif di malam 1.",
+        },
+        Investigator: {
+          category: "townsfolk",
+          desc: "Di malam pertama, tahu 2 pemain, salah satunya adalah Minion.",
+          note: "Hanya aktif di malam 1.",
+        },
+        Chef: {
+          category: "townsfolk",
+          desc: "Di malam pertama, tahu berapa pasangan tetangga yang jahat (0,1,2,dst).",
+          note: "Hanya aktif di malam 1.",
+        },
+        Empath: {
+          category: "townsfolk",
+          desc: "Setiap malam, tahu berapa tetangga kirinya & kanannya yang jahat (0,1,2).",
+          note: "Jika tetangga mati, posisi digantikan pemain hidup berikutnya.",
+        },
+        "Fortune Teller": {
+          category: "townsfolk",
+          desc: "Setiap malam pilih 2 pemain, tahu apakah salah satunya Demon.",
+          note: "Tidak bisa memilih diri sendiri.",
+        },
+        Undertaker: {
+          category: "townsfolk",
+          desc: "Setiap malam, tahu role sebenarnya dari pemain yang dieksekusi di siang hari.",
+          note: "Hanya aktif jika ada eksekusi.",
+        },
+        Monk: {
+          category: "townsfolk",
+          desc: "Setiap malam pilih 1 pemain (bukan diri sendiri), lindungi dari serangan Demon.",
+          note: "Tidak melindungi dari eksekusi.",
+        },
+        Ravenkeeper: {
+          category: "townsfolk",
+          desc: "Jika mati di malam hari, bisa melihat role 1 pemain.",
+          note: "Jika mati karena eksekusi, kemampuan tidak aktif.",
+        },
+        Virgin: {
+          category: "townsfolk",
+          desc: "Jika pemain baik menominasinya, nominator langsung dieksekusi.",
+          note: "Hanya 1x sepanjang game.",
+        },
+        Slayer: {
+          category: "townsfolk",
+          desc: "1x sepanjang game di siang hari, pilih 1 pemain → jika Demon, Demon langsung mati.",
+          note: "Jika target Recluse, tembakan gagal.",
+        },
+        Soldier: {
+          category: "townsfolk",
+          desc: "Kebal terhadap serangan Demon di malam hari.",
+          note: "Masih bisa mati karena eksekusi.",
+        },
+        Mayor: {
+          category: "townsfolk",
+          desc: "Jika mati di malam hari dan hanya tersisa 4 pemain hidup, tim baik langsung menang.",
+          note: "Kondisi khusus.",
+        },
+        // Outsider
+        Drunk: {
+          category: "outsider",
+          desc: "Tidak punya kemampuan (merasa punya role Townsfolk, tapi sebenarnya tidak).",
+          note: "Pemain TIDAK TAHU bahwa dirinya Drunk. Semua informasi bisa salah.",
+        },
+        Recluse: {
+          category: "outsider",
+          desc: "Bisa terdeteksi sebagai jahat, Minion, atau Demon.",
+          note: "Membingungkan semua informasi yang melibatkan dirinya. Slayer gagal menembaknya.",
+        },
+        Saint: {
+          category: "outsider",
+          desc: "Jika dieksekusi → Tim Baik kalah. Jika dibunuh Demon → 1 Minion mati.",
+          note: "Bisa lebih dari 1 Saint dalam game (untuk 15+ pemain).",
+        },
+        // Minion
+        Poisoner: {
+          category: "minion",
+          desc: "Setiap malam pilih 1 pemain untuk diracun.",
+          note: "Pemain yang diracun mendapat informasi salah selama 1 malam + 1 siang.",
+        },
+        Spy: {
+          category: "minion",
+          desc: "Setiap malam bisa melihat grimoire (buku catatan Storyteller).",
+          note: "Tahu semua role sebenarnya. Kebal racun.",
+        },
+        "Scarlet Woman": {
+          category: "minion",
+          desc: "Jika Imp mati (dan Scarlet Woman masih hidup), Scarlet Woman menjadi Imp baru.",
+          note: "Hanya bereaksi jika Imp yang mati (bukan Po).",
+        },
+        Necromancer: {
+          category: "minion",
+          desc: "Jika Demon mati (Imp atau Po), aktif di malam berikutnya.",
+          note: "Pilih 1 Minion korban + 1 Townsfolk jadi Demon baru. Necromancer juga mati.",
+        },
+        // Demon
+        Imp: {
+          category: "demon",
+          desc: "Setiap malam bunuh 1 pemain. Bisa bunuh diri → pilih 1 Minion jadi Imp baru.",
+          note: "Jika mati dan tidak ada Scarlet Woman, tim jahat kalah.",
+        },
+        Po: {
+          category: "demon",
+          desc: "Setiap malam bunuh 1 pemain. Jika tidak bunuh, malam berikutnya bisa bunuh 3 orang.",
+          note: 'Mekanisme "Charge".',
+        },
+      };
+
+      const ROLE_CATEGORIES = {
+        townsfolk: { name: "🔵 Townsfolk", color: "#2c6e2c" },
+        outsider: { name: "🔵 Outsider", color: "#5dade2" },
+        minion: { name: "🔴 Minion", color: "#c0392b" },
+        demon: { name: "🔴 Demon", color: "#6b0000" },
+      };
+
+      // ==================== RENDER ROLE DETAILS ====================
+      function renderRoleDetails(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const townsfolkRoles = Object.keys(ROLE_DETAILS).filter(
+          (r) => ROLE_DETAILS[r].category === "townsfolk"
+        );
+        const outsiderRoles = Object.keys(ROLE_DETAILS).filter(
+          (r) => ROLE_DETAILS[r].category === "outsider"
+        );
+        const minionRoles = Object.keys(ROLE_DETAILS).filter(
+          (r) => ROLE_DETAILS[r].category === "minion"
+        );
+        const demonRoles = Object.keys(ROLE_DETAILS).filter(
+          (r) => ROLE_DETAILS[r].category === "demon"
+        );
+
+        container.innerHTML = `
+            <h3 style="color:#e94560; margin-bottom:15px;">📚 Daftar Role & Kemampuan</h3>
+            <div class="role-category">
+                <h4>🔵 Townsfolk (13)</h4>
+                <div class="role-grid">
+                    ${townsfolkRoles
+                      .map(
+                        (role) => `
+                        <div class="role-card" onclick="showRoleDetail('${role}')">
+                            <div class="role-name">${role}</div>
+                            <div class="role-desc">${ROLE_DETAILS[
+                              role
+                            ].desc.substring(0, 50)}...</div>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+            </div>
+            <div class="role-category">
+                <h4>🔵 Outsider (3)</h4>
+                <div class="role-grid">
+                    ${outsiderRoles
+                      .map(
+                        (role) => `
+                        <div class="role-card" onclick="showRoleDetail('${role}')">
+                            <div class="role-name">${role}</div>
+                            <div class="role-desc">${ROLE_DETAILS[
+                              role
+                            ].desc.substring(0, 50)}...</div>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+            </div>
+            <div class="role-category">
+                <h4>🔴 Minion (4)</h4>
+                <div class="role-grid">
+                    ${minionRoles
+                      .map(
+                        (role) => `
+                        <div class="role-card" onclick="showRoleDetail('${role}')">
+                            <div class="role-name">${role}</div>
+                            <div class="role-desc">${ROLE_DETAILS[
+                              role
+                            ].desc.substring(0, 50)}...</div>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+            </div>
+            <div class="role-category">
+                <h4>🔴 Demon (2)</h4>
+                <div class="role-grid">
+                    ${demonRoles
+                      .map(
+                        (role) => `
+                        <div class="role-card" onclick="showRoleDetail('${role}')">
+                            <div class="role-name">${role}</div>
+                            <div class="role-desc">${ROLE_DETAILS[
+                              role
+                            ].desc.substring(0, 50)}...</div>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+            </div>
+        `;
+      }
+
+      function showRoleDetail(roleName) {
+        const detail = ROLE_DETAILS[roleName];
+        if (!detail) return;
+
+        const category = ROLE_CATEGORIES[detail.category];
+        const modal = document.createElement("div");
+        modal.className = "role-detail-modal";
+        modal.innerHTML = `
+            <div class="role-detail-content">
+                <div class="role-detail-name">${roleName}</div>
+                <div class="role-detail-category" style="background:${category.color}">${category.name}</div>
+                <div class="role-detail-desc">${detail.desc}</div>
+                <div class="role-detail-note">
+                    <strong>📌 Catatan:</strong> ${detail.note}
+                </div>
+                <button id="closeRoleDetailBtn" class="success" style="margin-top:15px;">Tutup</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById("closeRoleDetailBtn").onclick = () =>
+          modal.remove();
+      }
+
+      // ==================== EXISTING DATA (NO CHANGES BELOW) ====================
       let players = [];
       let currentNight = 1;
       let currentDay = 0;
@@ -659,7 +966,6 @@
       let executionLogs = [];
       let dayDeadNames = [];
 
-      // Night step results
       let currentNightSteps = [];
       let protectedPlayerId = null;
       let killedByDemon = [];
@@ -671,19 +977,16 @@
       let necromancerPending = false;
       let necromancerTargetDemonType = null;
 
-      // Demon data
       let demonsInGame = [];
       let hasTwoDemons = false;
       let gameWinner = null;
 
-      // Roulette data
       let roulettePlayerNames = [];
       let rouletteAssignedRoles = [];
       let rouletteCurrentIndex = 0;
       let rouletteModal = null;
       let rouletteSpinInterval = null;
 
-      // Role lists
       const TOWNSFOLK = [
         "Washerwoman",
         "Librarian",
@@ -703,7 +1006,6 @@
       const MINIONS = ["Poisoner", "Spy", "Scarlet Woman", "Necromancer"];
       const DEMONS = ["Imp", "Po"];
 
-      // ==================== HELPER FUNCTIONS ====================
       function getRoleCategory(role) {
         if (TOWNSFOLK.includes(role)) return "townsfolk";
         if (OUTSIDERS_BASE.includes(role) || role === "Drunk")
@@ -852,7 +1154,6 @@
             .join("");
       }
 
-      // ==================== UPDATE DEAD PLAYERS LIST ====================
       function updateGrimoireAndDayDeadList() {
         const aliveContainer = document.getElementById("grimoireList");
         const deadContainer = document.getElementById("deadPlayersList");
@@ -935,7 +1236,6 @@
         updateGrimoireAndDayDeadList();
       }
 
-      // ==================== SCARLET WOMAN FUNCTION ====================
       function activateScarletWoman(deadImpName) {
         const scarletWoman = players.find(
           (p) => p.actualRole === "Scarlet Woman" && p.isAlive
@@ -972,7 +1272,6 @@
         return false;
       }
 
-      // ==================== NECROMANCER FUNCTION ====================
       function queueNecromancer(demonType) {
         const necromancer = players.find(
           (p) => p.actualRole === "Necromancer" && p.isAlive
@@ -1118,7 +1417,6 @@
         return true;
       }
 
-      // ==================== ROLE GENERATION ====================
       function getSaintCountForPlayerCount(playerCount) {
         if (playerCount >= 19) return 3;
         if (playerCount >= 15) return 2;
@@ -1236,7 +1534,6 @@
         return newPlayers;
       }
 
-      // ==================== ROULETTE ====================
       function startRoulette() {
         const nameInputs = document.querySelectorAll(".player-name-input");
         roulettePlayerNames = [];
@@ -1418,7 +1715,6 @@
           );
       }
 
-      // ==================== NIGHT PHASE BUILD STEPS ====================
       function buildNightSteps() {
         const steps = [];
         const isFirstNight = currentNight === 1;
@@ -1529,7 +1825,6 @@
             autoExecute: true,
           });
 
-        // MONK - Sebelum Demon Kill (sesuai permintaan)
         const monk = players.find((p) => p.actualRole === "Monk" && p.isAlive);
         if (monk)
           steps.push({
@@ -1538,7 +1833,6 @@
             desc: "Pilih 1 pemain untuk dilindungi.",
           });
 
-        // DEMON KILL - Setelah Monk
         const aliveDemons = players.filter(
           (p) => DEMONS.includes(p.actualRole) && p.isAlive
         );
@@ -1577,7 +1871,6 @@
         return steps;
       }
 
-      // ==================== NIGHT PHASE RENDER ====================
       function renderNightStep(step, stepIndex) {
         const container = document.getElementById("nightStepsList");
         if (!container) return;
@@ -1594,7 +1887,6 @@
         const actionsDiv = document.getElementById(`stepActions_${stepIndex}`);
         const resultDiv = document.getElementById(`stepResult_${stepIndex}`);
 
-        // Poisoner
         if (step.type === "poisoner") {
           const select = document.createElement("select");
           select.id = "poisonerTarget";
@@ -1624,9 +1916,7 @@
           };
           actionsDiv.appendChild(select);
           actionsDiv.appendChild(btn);
-        }
-        // Fortune Teller
-        else if (step.type === "fortune_teller") {
+        } else if (step.type === "fortune_teller") {
           const alivePlayers = players.filter((p) => p.isAlive);
           const select1 = document.createElement("select");
           select1.id = "ft1";
@@ -1688,9 +1978,7 @@
           actionsDiv.appendChild(select1);
           actionsDiv.appendChild(select2);
           actionsDiv.appendChild(btn);
-        }
-        // Empath
-        else if (step.type === "empath") {
+        } else if (step.type === "empath") {
           const empathPlayer = players.find(
             (p) => p.actualRole === "Empath" && p.isAlive
           );
@@ -1707,15 +1995,13 @@
                 : 0
               : trueCount;
             const resultText = isPoisoned
-              ? `Jumlah tetangga jahat: ${displayCount}`
+              ? `Jumlah tetangga jahat: ${displayCount} (seharusnya ${trueCount})`
               : `Jumlah tetangga jahat: ${displayCount}`;
             addNightLog(`Empath (${empathPlayer.name}) → ${resultText}`);
             resultDiv.innerHTML = `<div class="info-text">👂 ${resultText}</div>`;
             resultDiv.classList.remove("hidden");
           }
-        }
-        // Washerwoman
-        else if (step.type === "washerwoman") {
+        } else if (step.type === "washerwoman") {
           const wwPlayer = players.find(
             (p) => p.actualRole === "Washerwoman" && p.isAlive
           );
@@ -1735,9 +2021,7 @@
             resultDiv.innerHTML = `<div class="info-text">🧼 ${result}</div>`;
             resultDiv.classList.remove("hidden");
           }
-        }
-        // Librarian
-        else if (step.type === "librarian") {
+        } else if (step.type === "librarian") {
           const libPlayer = players.find(
             (p) => p.actualRole === "Librarian" && p.isAlive
           );
@@ -1757,9 +2041,7 @@
             resultDiv.innerHTML = `<div class="info-text">📚 ${result}</div>`;
             resultDiv.classList.remove("hidden");
           }
-        }
-        // Investigator
-        else if (step.type === "investigator") {
+        } else if (step.type === "investigator") {
           const invPlayer = players.find(
             (p) => p.actualRole === "Investigator" && p.isAlive
           );
@@ -1779,9 +2061,7 @@
             resultDiv.innerHTML = `<div class="info-text">🔍 ${result}</div>`;
             resultDiv.classList.remove("hidden");
           }
-        }
-        // Chef
-        else if (step.type === "chef") {
+        } else if (step.type === "chef") {
           const chefPlayer = players.find(
             (p) => p.actualRole === "Chef" && p.isAlive
           );
@@ -1797,9 +2077,7 @@
             resultDiv.innerHTML = `<div class="info-text">🍳 Jumlah pasangan tetangga jahat: ${displayCount}</div>`;
             resultDiv.classList.remove("hidden");
           }
-        }
-        // Monk
-        else if (step.type === "monk") {
+        } else if (step.type === "monk") {
           const monkPlayer = players.find(
             (p) => p.actualRole === "Monk" && p.isAlive
           );
@@ -1836,9 +2114,7 @@
             actionsDiv.appendChild(select);
             actionsDiv.appendChild(btn);
           }
-        }
-        // Demon Kill
-        else if (step.type === "demon_kill") {
+        } else if (step.type === "demon_kill") {
           const demonPlayer = players.find(
             (p) => p.id === step.demonId && p.isAlive
           );
@@ -2005,9 +2281,7 @@
               }
             }
           }
-        }
-        // Necromancer
-        else if (step.type === "necromancer") {
+        } else if (step.type === "necromancer") {
           const necromancerPlayer = players.find(
             (p) => p.actualRole === "Necromancer" && p.isAlive
           );
@@ -2042,7 +2316,10 @@
               townSelect.innerHTML =
                 '<option value="">-- Pilih target jadi Demon --</option>' +
                 aliveTownsfolk
-                  .map((p) => `<option value="${p.id}">${p.name}</option>`)
+                  .map(
+                    (p) =>
+                      `<option value="${p.id}">${p.name} (${p.actualRole})</option>`
+                  )
                   .join("");
               const btn = document.createElement("button");
               btn.innerHTML = "💀 Ubah Jadi Demon";
@@ -2113,14 +2390,10 @@
               actionsDiv.appendChild(btn);
             }
           }
-        }
-        // Auto-complete steps
-        else if (step.autoComplete || step.autoExecute) {
+        } else if (step.autoComplete || step.autoExecute) {
           resultDiv.innerHTML = `<div class="info-text">✅ Step selesai. Lanjut ke step berikutnya.</div>`;
           resultDiv.classList.remove("hidden");
-        }
-        // Default
-        else {
+        } else {
           resultDiv.innerHTML = `<div class="info-text">✅ Step selesai. Lanjut ke step berikutnya.</div>`;
           resultDiv.classList.remove("hidden");
         }
@@ -2230,7 +2503,6 @@
           p.isPoisoned = false;
         });
 
-        // Ravenkeeper check
         for (const killed of killedPlayers) {
           const killedPlayer = players.find((p) => p.id === killed.id);
           if (
@@ -2280,7 +2552,6 @@
           }
         }
 
-        // Scarlet Woman check (Imp mati)
         const deadImp = killedPlayers.find((k) => {
           const p = players.find((p) => p.id === k.id);
           return p && p.actualRole === "Imp";
@@ -2297,7 +2568,6 @@
           }
         }
 
-        // Necromancer check for Po
         const deadPo = killedPlayers.find((k) => {
           const p = players.find((p) => p.id === k.id);
           return p && p.actualRole === "Po";
@@ -2334,7 +2604,6 @@
         alert(`Malam ${currentNight} selesai. Beralih ke Siang ${currentDay}.`);
       }
 
-      // ==================== SLAYER ====================
       function updateSlayerSection() {
         const slayer = players.find(
           (p) => p.actualRole === "Slayer" && p.isAlive
@@ -2404,7 +2673,6 @@
         }
       }
 
-      // ==================== DAY PHASE ====================
       function addNominasi() {
         const nominatorId = parseInt(
           document.getElementById("nominatorSelect").value
@@ -2593,7 +2861,6 @@
         );
       }
 
-      // ==================== UI UPDATE ====================
       function updateLiveStatus() {
         const aliveDemons = players.filter(
           (p) => DEMONS.includes(p.actualRole) && p.isAlive
@@ -2718,12 +2985,15 @@
           tbody.innerHTML = nominations
             .map(
               (n, idx) => `
-                <tr><td>${idx + 1}</td><td>${n.nominatorName}</td><td>${
-                n.targetName
-              }</td><td>${n.votes}</td>
-                <td><button onclick="selectForVote(${
-                  n.id
-                })" class="secondary" style="padding:4px 8px;">Vote</button></td></tr>
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>${n.nominatorName}</td>
+                    <td>${n.targetName}</td>
+                    <td>${n.votes}</td>
+                    <td><button onclick="selectForVote(${
+                      n.id
+                    })" class="secondary" style="padding:4px 8px;">Vote</button></td>
+                </tr>
             `
             )
             .join("");
@@ -2899,7 +3169,6 @@
         alert("Game dimuat!");
       }
 
-      // ==================== INIT ====================
       function initNameInputs() {
         const container = document.getElementById("playerNameInputs");
         let nameList = Array(15)
@@ -3036,6 +3305,10 @@
 
       initNameInputs();
       initTabs();
+
+      // ==================== RENDER ROLE DETAILS ====================
+      renderRoleDetails("roleDetailsSetup");
+      renderRoleDetails("roleDetailsGrimoire");
     </script>
   </body>
 </html>
