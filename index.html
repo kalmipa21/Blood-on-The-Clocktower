@@ -1995,7 +1995,7 @@
                 : 0
               : trueCount;
             const resultText = isPoisoned
-              ? `Jumlah tetangga jahat: ${displayCount} (seharusnya ${trueCount})`
+              ? `Jumlah tetangga jahat: ${displayCount}`
               : `Jumlah tetangga jahat: ${displayCount}`;
             addNightLog(`Empath (${empathPlayer.name}) → ${resultText}`);
             resultDiv.innerHTML = `<div class="info-text">👂 ${resultText}</div>`;
@@ -2015,7 +2015,7 @@
             let result = `Salah satu dari ${randomTownsfolk?.name} dan ${randomOther?.name} adalah Townsfolk.`;
             if (isPoisoned) {
               const fake = getRandomMinion() || getRandomOutsider();
-              result = `Salah satu dari ${fake?.name} dan ${randomOther?.name} adalah Townsfolk. (INFO SALAH)`;
+              result = `Salah satu dari ${fake?.name} dan ${randomOther?.name} adalah Townsfolk.`;
             }
             addNightLog(`Washerwoman (${wwPlayer.name}) → ${result}`);
             resultDiv.innerHTML = `<div class="info-text">🧼 ${result}</div>`;
@@ -2035,7 +2035,7 @@
             let result = `Salah satu dari ${randomOutsider?.name} dan ${randomOther?.name} adalah Outsider.`;
             if (isPoisoned) {
               const fake = getRandomTownsfolk() || getRandomMinion();
-              result = `Salah satu dari ${fake?.name} dan ${randomOther?.name} adalah Outsider. (INFO SALAH)`;
+              result = `Salah satu dari ${fake?.name} dan ${randomOther?.name} adalah Outsider.`;
             }
             addNightLog(`Librarian (${libPlayer.name}) → ${result}`);
             resultDiv.innerHTML = `<div class="info-text">📚 ${result}</div>`;
@@ -2055,7 +2055,7 @@
             let result = `Salah satu dari ${randomMinion?.name} dan ${randomOther?.name} adalah Minion.`;
             if (isPoisoned) {
               const fake = getRandomTownsfolk() || getRandomOutsider();
-              result = `Salah satu dari ${fake?.name} dan ${randomOther?.name} adalah Minion. (INFO SALAH)`;
+              result = `Salah satu dari ${fake?.name} dan ${randomOther?.name} adalah Minion.`;
             }
             addNightLog(`Investigator (${invPlayer.name}) → ${result}`);
             resultDiv.innerHTML = `<div class="info-text">🔍 ${result}</div>`;
